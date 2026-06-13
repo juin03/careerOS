@@ -124,6 +124,6 @@ export function getDemandData(): DemandData {
     nationalTopSkills,
     totalOpenings: regionalJobs.length,
     methodology:
-      "Demand is derived from open job postings on Career OS: each posting maps to a role, and each role to the skills it requires. Counts are aggregated by region. This is an illustrative dataset built from platform listings — not official government data.",
+      "Skill demand is derived from open job postings on Career OS: each posting maps to a role, and each role to the skills it requires, aggregated by region (illustrative platform data). National labour-market figures shown above are real and live from the Department of Statistics Malaysia (DOSM) open data API. A production build would ingest DOSM occupational wage data and live job-board feeds to make per-skill demand fully official.",
   };
 }

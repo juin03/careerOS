@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { MapPin, Download, TrendingUp, Briefcase, Info, ArrowLeft } from "lucide-react";
+import { MapPin, Download, TrendingUp, Briefcase, Info, ArrowLeft, Users } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getDemandData } from "@/lib/demand-analytics";
+import { getLabourSnapshot } from "@/lib/dosm";
 import { DemandCharts } from "./demand-charts";
 import { pct } from "@/lib/format";
 
@@ -14,8 +15,16 @@ export const metadata = {
     "Where skills are in demand across Malaysia — derived from live job postings. Open data for universities, policymakers, and the public.",
 };
 
-export default function DemandPage() {
+function fmtMonth(date: string): string {
+  return new Date(date).toLocaleDateString("en-MY", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export default async function DemandPage() {
   const data = getDemandData();
+  const labour = await getLabourSnapshot();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -87,6 +96,42 @@ export default function DemandPage() {
           </div>
         </div>
 
+        {/* Real national labour-market context, live from DOSM */}
+        {labour && (
+          <div className="rounded-xl border bg-card p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <h2 className="font-semibold">Malaysia&apos;s labour market</h2>
+                <Badge variant="secondary" className="gap-1">
+                  Live · {fmtMonth(labour.date)}
+                </Badge>
+              </div>
+              <span className="text-xs text-muted-foreground">
+                Source: {labour.source}
+              </span>
+            </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-4">
+              <LabourStat
+                value={`${(labour.employed / 1000).toFixed(1)}M`}
+                label="Employed"
+              />
+              <LabourStat
+                value={`${labour.unemploymentRate}%`}
+                label="Unemployment rate"
+              />
+              <LabourStat
+                value={`${labour.participationRate}%`}
+                label="Participation rate"
+              />
+              <LabourStat
+                value={`${(labour.labourForce / 1000).toFixed(1)}M`}
+                label="Labour force"
+              />
+            </div>
+          </div>
+        )}
+
         <DemandCharts
           regions={data.regions}
           nationalTopSkills={data.nationalTopSkills}
@@ -135,6 +180,15 @@ export default function DemandPage() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function LabourStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <div className="text-2xl font-semibold tracking-tight">{value}</div>
+      <div className="text-sm text-muted-foreground">{label}</div>
     </div>
   );
 }
