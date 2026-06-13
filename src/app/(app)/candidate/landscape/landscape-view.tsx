@@ -12,6 +12,8 @@ import {
   CircleDashed,
   Navigation,
   Info,
+  RotateCcw,
+  Compass,
 } from "lucide-react";
 import {
   LandscapeMap,
@@ -27,11 +29,15 @@ export function LandscapeView({
   moves,
   narration,
   usedAI,
+  exploring,
+  homeRoleTitle,
 }: {
   current: { title: string; salaryMin: number; salaryMax: number };
   moves: LandscapeMoveDTO[];
   narration: string;
   usedAI: boolean;
+  exploring: boolean;
+  homeRoleTitle: string;
 }) {
   const [selected, setSelected] = useState<LandscapeMoveDTO | null>(
     moves[0] ?? null,
@@ -58,13 +64,25 @@ export function LandscapeView({
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Your landscape</h1>
-        <p className="mt-1 text-muted-foreground">
-          Where people went next from{" "}
-          <span className="font-medium text-foreground">{current.title}</span>. Pick
-          a path.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {exploring ? `Exploring from ${current.title}` : "Your landscape"}
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Where people went next from{" "}
+            <span className="font-medium text-foreground">{current.title}</span>.
+            Pick a path{exploring ? "" : " — or explore from any role"}.
+          </p>
+        </div>
+        {exploring && (
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link href="/candidate/landscape">
+              <RotateCcw className="h-3.5 w-3.5" />
+              Back to {homeRoleTitle}
+            </Link>
+          </Button>
+        )}
       </div>
 
       {/* AI narration */}
@@ -203,6 +221,12 @@ function MoveDetail({
           <Link href={`/candidate/jobs?target=${move.roleId}`}>
             <Navigation className="h-4 w-4" />
             Find stepping-stone jobs
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm" className="w-full gap-2">
+          <Link href={`/candidate/landscape?from=${move.roleId}`}>
+            <Compass className="h-4 w-4" />
+            Explore paths from here
           </Link>
         </Button>
       </div>

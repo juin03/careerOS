@@ -6,16 +6,27 @@ import { narrateLandscape } from "@/lib/ai/narrate";
 import { LandscapeView } from "./landscape-view";
 import type { LandscapeMoveDTO } from "@/components/landscape-map";
 
-export default async function LandscapePage() {
+export default async function LandscapePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const params = await searchParams;
   const profile = await requireProfile("candidate");
   const shape = await getCandidateShape(profile);
 
   if (!shape.seedRoleId) redirect("/onboarding");
 
-  const current = getRole(shape.seedRoleId)!;
+  // Re-rooting: the user can explore the tree from any role via ?from=<roleId>.
+  // Falls back to their actual current role.
+  const exploring = Boolean(params.from && params.from !== shape.seedRoleId);
+  const rootRoleId =
+    params.from && getRole(params.from) ? params.from : shape.seedRoleId;
+
+  const current = getRole(rootRoleId)!;
   // Narration reads the direct next moves; the map shows the two-level tree.
-  const directMoves = landscapeFrom(shape.seedRoleId, shape.skills);
-  const tree = landscapeTree(shape.seedRoleId, shape.skills);
+  const directMoves = landscapeFrom(rootRoleId, shape.skills);
+  const tree = landscapeTree(rootRoleId, shape.skills);
   const narration = await narrateLandscape(current.title, directMoves);
 
   const moveDTOs: LandscapeMoveDTO[] = tree.map((m) => ({
@@ -46,6 +57,8 @@ export default async function LandscapePage() {
       moves={moveDTOs}
       narration={narration.text}
       usedAI={narration.usedAI}
+      exploring={exploring}
+      homeRoleTitle={getRole(shape.seedRoleId)!.title}
     />
   );
 }
