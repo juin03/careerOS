@@ -30,6 +30,9 @@ export interface LandscapeMoveDTO {
   have: string[];
   salaryDeltaMin: number;
   salaryDeltaMax: number;
+  // Tree position (1 = direct next move, 2 = the move after that).
+  depth?: 1 | 2;
+  parentRoleId?: string;
 }
 
 interface CurrentDTO {
@@ -60,8 +63,34 @@ function MoveNode({
   data: { move: LandscapeMoveDTO; selected: boolean; onSelect: () => void };
 }) {
   const { move } = data;
+  const compact = move.depth === 2;
   const trend =
     move.salaryDeltaMin > 200 ? "up" : move.salaryDeltaMin < -200 ? "down" : "flat";
+
+  // Depth-2 ("then") nodes render small and quiet so the hierarchy reads.
+  if (compact) {
+    return (
+      <button
+        onClick={data.onSelect}
+        className={cn(
+          "w-44 cursor-pointer rounded-lg border bg-card/70 p-2.5 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+          data.selected
+            ? "border-primary ring-2 ring-primary/40"
+            : "border-dashed hover:border-primary/50",
+        )}
+      >
+        <Handle type="target" position={Position.Left} className="!bg-muted-foreground" />
+        <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          then
+        </div>
+        <div className="text-sm font-medium leading-tight">{move.title}</div>
+        <div className="mt-1 text-[10px] text-muted-foreground">
+          {rmRange(move.salaryMin, move.salaryMax)}
+        </div>
+      </button>
+    );
+  }
+
   return (
     <button
       onClick={data.onSelect}
@@ -73,6 +102,7 @@ function MoveNode({
       )}
     >
       <Handle type="target" position={Position.Left} className="!bg-muted-foreground" />
+      <Handle type="source" position={Position.Right} className="!bg-muted-foreground" />
       <div className="flex items-start justify-between gap-2">
         <div className="font-medium leading-tight">{move.title}</div>
         <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
@@ -116,21 +146,52 @@ export function LandscapeMap({
 }) {
   // Nodes/edges are derived purely from props — they aren't draggable, so there's
   // no internal graph state to keep. Recompute on selection change via useMemo.
+  // Layout is three columns: current (You) -> depth-1 moves -> depth-2 moves.
   const nodes = useMemo<Node[]>(() => {
+    const firstLevel = moves.filter((m) => (m.depth ?? 1) === 1);
+    const secondLevel = moves.filter((m) => m.depth === 2);
+
+    const COL = { current: 0, first: 340, second: 700 };
+    const ROW = 130;
+
     const ns: Node[] = [
       {
         id: "current",
         type: "current",
-        position: { x: 0, y: Math.max(0, (moves.length - 1) * 60) },
+        position: {
+          x: COL.current,
+          y: Math.max(0, ((firstLevel.length - 1) * ROW) / 2),
+        },
         data: { current },
         draggable: false,
       },
     ];
-    moves.forEach((m, i) => {
+
+    firstLevel.forEach((m, i) => {
       ns.push({
         id: m.roleId,
         type: "move",
-        position: { x: 360, y: i * 120 },
+        position: { x: COL.first, y: i * ROW },
+        data: {
+          move: m,
+          selected: selectedRoleId === m.roleId,
+          onSelect: () => onSelectMove(m),
+        },
+        draggable: false,
+      });
+    });
+
+    // Position each depth-2 node near its parent, stacking when several share one.
+    const usedY: Record<number, number> = {};
+    secondLevel.forEach((m) => {
+      const parentIdx = firstLevel.findIndex((f) => f.roleId === m.parentRoleId);
+      const baseY = (parentIdx < 0 ? 0 : parentIdx) * ROW;
+      const slot = usedY[baseY] ?? 0;
+      usedY[baseY] = slot + 1;
+      ns.push({
+        id: m.roleId,
+        type: "move",
+        position: { x: COL.second, y: baseY + slot * 64 - 20 },
         data: {
           move: m,
           selected: selectedRoleId === m.roleId,
@@ -146,7 +207,7 @@ export function LandscapeMap({
     () =>
       moves.map((m) => ({
         id: `e-${m.roleId}`,
-        source: "current",
+        source: (m.depth ?? 1) === 1 ? "current" : (m.parentRoleId as string),
         target: m.roleId,
         animated: selectedRoleId === m.roleId,
         style: {
@@ -162,7 +223,7 @@ export function LandscapeMap({
   );
 
   return (
-    <div className="h-[440px] w-full rounded-xl border bg-muted/20">
+    <div className="h-[520px] w-full rounded-xl border bg-muted/20">
       <ReactFlow
         nodes={nodes}
         edges={edges}

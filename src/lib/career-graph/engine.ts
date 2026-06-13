@@ -64,6 +64,42 @@ export function landscapeFrom(
     .sort((a, b) => b.transition.share - a.transition.share);
 }
 
+// A two-level career tree: current role -> next moves -> the moves after those.
+// This is what makes the map read like a roadmap/flowchart rather than a star.
+export interface TreeMove extends LandscapeMove {
+  depth: 1 | 2;
+  parentRoleId: string; // which role this branches from
+}
+
+export function landscapeTree(
+  currentRoleId: string,
+  skills: string[],
+  opts: { maxFirst?: number; maxSecond?: number } = {},
+): TreeMove[] {
+  const maxFirst = opts.maxFirst ?? 4;
+  const maxSecond = opts.maxSecond ?? 2;
+
+  const first = landscapeFrom(currentRoleId, skills).slice(0, maxFirst);
+  const seen = new Set<string>([currentRoleId, ...first.map((m) => m.role.id)]);
+  const tree: TreeMove[] = first.map((m) => ({
+    ...m,
+    depth: 1,
+    parentRoleId: currentRoleId,
+  }));
+
+  for (const m of first) {
+    const second = landscapeFrom(m.role.id, skills)
+      .filter((s) => !seen.has(s.role.id)) // avoid cycles / dupes across branches
+      .slice(0, maxSecond);
+    for (const s of second) {
+      seen.add(s.role.id);
+      tree.push({ ...s, depth: 2, parentRoleId: m.role.id });
+    }
+  }
+
+  return tree;
+}
+
 // GPS routing: shortest realistic path (by hops, then by combined share) from a
 // current role to a chosen destination. Returns the ordered list of roles, or
 // null if no path exists in the graph.

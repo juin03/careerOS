@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { getCandidateShape } from "@/lib/candidate-data";
-import { landscapeFrom, getRole } from "@/lib/career-graph/engine";
+import { landscapeFrom, landscapeTree, getRole } from "@/lib/career-graph/engine";
 import { narrateLandscape } from "@/lib/ai/narrate";
 import { LandscapeView } from "./landscape-view";
 import type { LandscapeMoveDTO } from "@/components/landscape-map";
@@ -13,10 +13,12 @@ export default async function LandscapePage() {
   if (!shape.seedRoleId) redirect("/onboarding");
 
   const current = getRole(shape.seedRoleId)!;
-  const moves = landscapeFrom(shape.seedRoleId, shape.skills);
-  const narration = await narrateLandscape(current.title, moves);
+  // Narration reads the direct next moves; the map shows the two-level tree.
+  const directMoves = landscapeFrom(shape.seedRoleId, shape.skills);
+  const tree = landscapeTree(shape.seedRoleId, shape.skills);
+  const narration = await narrateLandscape(current.title, directMoves);
 
-  const moveDTOs: LandscapeMoveDTO[] = moves.map((m) => ({
+  const moveDTOs: LandscapeMoveDTO[] = tree.map((m) => ({
     roleId: m.role.id,
     title: m.role.title,
     family: m.role.family,
@@ -30,6 +32,8 @@ export default async function LandscapePage() {
     have: m.gap.have,
     salaryDeltaMin: m.salaryDeltaMin,
     salaryDeltaMax: m.salaryDeltaMax,
+    depth: m.depth,
+    parentRoleId: m.parentRoleId,
   }));
 
   return (

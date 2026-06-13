@@ -9,8 +9,8 @@ export default function LandscapeLoading() {
       </div>
       <Skeleton className="h-20 w-full rounded-xl" />
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <Skeleton className="h-[440px] w-full rounded-xl" />
-        <Skeleton className="h-[440px] w-full rounded-xl" />
+        <Skeleton className="h-[520px] w-full rounded-xl" />
+        <Skeleton className="h-[520px] w-full rounded-xl" />
       </div>
     </div>
   );
