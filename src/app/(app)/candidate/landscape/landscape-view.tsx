@@ -37,6 +37,25 @@ export function LandscapeView({
     moves[0] ?? null,
   );
 
+  // Defensive: a role at the very top of a track may have no further moves.
+  if (moves.length === 0) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 p-4 sm:p-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Your landscape</h1>
+        <div className="rounded-xl border bg-card p-8 text-center">
+          <p className="font-medium">
+            You&apos;re at the top of this track — {current.title}.
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            From here, growth is usually about scope and impact rather than a
+            named next role. Explore lateral moves in the Jobs tab, or refine
+            your profile to surface more directions.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6">
       <div>

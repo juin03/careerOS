@@ -166,6 +166,51 @@ export const ROLES: Role[] = [
       "Sits between business and tech, translating needs into requirements and process improvements.",
     skills: ["SQL", "Requirements", "Communication", "Process Design", "Data Analysis"],
   },
+  // Senior / leadership destinations — where the advanced roles lead next.
+  {
+    id: "r_principal_eng",
+    title: "Principal Engineer",
+    family: "Engineering",
+    seniority: 4,
+    salaryMin: 18000,
+    salaryMax: 30000,
+    description:
+      "The deep technical track's summit — sets architecture across teams without managing people. For those who want impact through engineering, not headcount.",
+    skills: ["Architecture", "System Design", "Mentoring", "Cloud", "Technical Strategy"],
+  },
+  {
+    id: "r_ai_lead",
+    title: "AI / ML Lead",
+    family: "Data",
+    seniority: 4,
+    salaryMin: 16000,
+    salaryMax: 28000,
+    description:
+      "Leads applied AI strategy and a team of ML engineers, owning what gets built and how it ships responsibly.",
+    skills: ["Machine Learning", "Technical Strategy", "People Management", "Cloud", "Stakeholder Management"],
+  },
+  {
+    id: "r_head_product",
+    title: "Head of Product",
+    family: "Leadership",
+    seniority: 5,
+    salaryMin: 22000,
+    salaryMax: 40000,
+    description:
+      "Owns the product org and vision across multiple teams. The senior end of the product track.",
+    skills: ["Product Strategy", "People Management", "Stakeholder Management", "Vision", "Data Analysis"],
+  },
+  {
+    id: "r_director_eng",
+    title: "Director of Engineering",
+    family: "Leadership",
+    seniority: 5,
+    salaryMin: 24000,
+    salaryMax: 45000,
+    description:
+      "Leads multiple engineering teams and managers — org design, strategy, and delivery at scale.",
+    skills: ["People Management", "Strategy", "Hiring", "Stakeholder Management", "System Design"],
+  },
 ];
 
 export const ROLE_BY_ID = Object.fromEntries(ROLES.map((r) => [r.id, r]));
@@ -323,6 +368,104 @@ export const TRANSITIONS: Transition[] = [
     share: 0.21,
     medianMonths: 24,
     note: "Growth and product blur at the senior end. A common consolidation of the two.",
+  },
+  // ── Paths out of the senior roles (so no role is a dead end) ──────────────
+  // ML Engineer
+  {
+    fromRoleId: "r_ml_engineer",
+    toRoleId: "r_ai_lead",
+    share: 0.34,
+    medianMonths: 30,
+    note: "Lead the ML team. More strategy and people, less hands-on modelling — a real identity shift.",
+  },
+  {
+    fromRoleId: "r_ml_engineer",
+    toRoleId: "r_principal_eng",
+    share: 0.18,
+    medianMonths: 36,
+    note: "Stay deeply technical but widen scope across systems. For those who'd rather architect than manage.",
+  },
+  {
+    fromRoleId: "r_ml_engineer",
+    toRoleId: "r_product_manager",
+    share: 0.12,
+    medianMonths: 28,
+    note: "AI PMs who can speak both languages are rare and valuable. Expect to trade code for decisions.",
+  },
+  // Senior SWE → Principal (deep track alternative to management)
+  {
+    fromRoleId: "r_senior_swe",
+    toRoleId: "r_principal_eng",
+    share: 0.22,
+    medianMonths: 36,
+    note: "The individual-contributor summit. Broader architectural impact without managing people.",
+  },
+  // Engineering Manager
+  {
+    fromRoleId: "r_eng_manager",
+    toRoleId: "r_director_eng",
+    share: 0.4,
+    medianMonths: 36,
+    note: "Lead managers, not just engineers. More org strategy, further from the code.",
+  },
+  {
+    fromRoleId: "r_eng_manager",
+    toRoleId: "r_head_product",
+    share: 0.08,
+    medianMonths: 40,
+    note: "A rarer cross into product leadership for EMs who love the 'what' and 'why'.",
+  },
+  // DevOps
+  {
+    fromRoleId: "r_devops",
+    toRoleId: "r_principal_eng",
+    share: 0.2,
+    medianMonths: 36,
+    note: "Grow from platform owner to setting technical direction across the org.",
+  },
+  {
+    fromRoleId: "r_devops",
+    toRoleId: "r_senior_swe",
+    share: 0.14,
+    medianMonths: 24,
+    note: "Move back toward product engineering with hard-won infra depth as an edge.",
+  },
+  {
+    fromRoleId: "r_devops",
+    toRoleId: "r_ml_engineer",
+    share: 0.1,
+    medianMonths: 30,
+    note: "MLOps is a natural bridge — your infra skills plus ML fundamentals open this door.",
+  },
+  // Product Manager
+  {
+    fromRoleId: "r_product_manager",
+    toRoleId: "r_head_product",
+    share: 0.32,
+    medianMonths: 40,
+    note: "Step up from owning a product to owning the product org and vision.",
+  },
+  {
+    fromRoleId: "r_product_manager",
+    toRoleId: "r_growth_manager",
+    share: 0.09,
+    medianMonths: 22,
+    note: "Lean into the metrics side. A lateral move for PMs energised by experiments and funnels.",
+  },
+  // AI Lead → Director (keeps senior roles flowing too)
+  {
+    fromRoleId: "r_ai_lead",
+    toRoleId: "r_director_eng",
+    share: 0.25,
+    medianMonths: 36,
+    note: "Broaden from AI to all of engineering leadership.",
+  },
+  {
+    fromRoleId: "r_principal_eng",
+    toRoleId: "r_director_eng",
+    share: 0.15,
+    medianMonths: 36,
+    note: "Cross from the IC track to leading the org — only if you find you want the people side after all.",
   },
 ];
 
