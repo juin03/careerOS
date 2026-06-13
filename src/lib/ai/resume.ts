@@ -7,32 +7,48 @@ export interface ResumeParse {
   location?: string;
   skills: string[];
   suggestedRoleId?: string;
+  // Richer signals for senior / specialised profiles.
+  yearsExperience?: number;
+  seniority?: "entry" | "junior" | "mid" | "senior" | "lead";
+  specialization?: string; // e.g. "Applied AI / LLM engineering"
+  highlights?: string[]; // standout achievements pulled from the resume
   usedAI: boolean;
 }
 
-// Parse a pasted resume into structured profile fields. Uses Gemini when a key
-// is configured; otherwise falls back to a deterministic keyword extractor so
-// the prototype always produces a sensible result.
+// Parse a pasted resume into structured profile fields. Uses Azure OpenAI when a
+// key is configured; otherwise falls back to a deterministic extractor so the
+// prototype always produces a sensible result.
 export async function parseResume(text: string): Promise<ResumeParse> {
   if (hasAI()) {
-    const roleList = ROLES.map((r) => `${r.id}: ${r.title}`).join(", ");
-    const prompt = `You are parsing a candidate's resume for a Malaysian careers platform.
-Extract structured data. Choose the single best matching current role id from this fixed list:
+    const roleList = ROLES.map(
+      (r) => `${r.id}: ${r.title} (seniority ${r.seniority}/5, ${r.family})`,
+    ).join("\n");
+
+    const prompt = `You are parsing a candidate's resume for a Malaysian careers platform. Be precise and generous in recognising real expertise — many candidates are more senior or specialised than a quick read suggests.
+
+Pick the single best-fitting CURRENT role id from this list. Match on BOTH the work described and the seniority implied by scope and impact (don't under-level a strong person):
 ${roleList}
 
-Known skill vocabulary (prefer these when present): ${SKILLS.join(", ")}.
+Seniority guidance: count internships and concurrent study realistically. Someone in a real engineering role now (even ~1 year, with strong internships and production ownership) is at least "junior", often "mid" if they own systems end-to-end. Title the headline by their CURRENT role and niche, e.g. "AI Engineer building production LLM agents on AWS".
+
+Known skill vocabulary (prefer these spellings when the skill is present): ${SKILLS.join(", ")}.
+But ALSO include notable real skills/technologies the candidate clearly has even if not in that list (e.g. specific cloud services, frameworks, tools).
 
 Resume:
 """
-${text.slice(0, 6000)}
+${text.slice(0, 9000)}
 """
 
-Return JSON with keys:
+Return JSON:
 - fullName (string or null)
-- headline (a short one-line summary, e.g. "Fresh CS graduate, Universiti Malaya")
-- location (city in Malaysia or null)
-- skills (array of skill strings, prefer the known vocabulary, max 10)
-- suggestedRoleId (one id from the list that best fits their current level)`;
+- headline (one specific line capturing who they are now, e.g. "AI Engineer building LLM agents on AWS, 1 yr + strong internships")
+- location (Malaysian city or null)
+- skills (array, up to 14, most relevant first — mix known vocab + their standout real technologies)
+- suggestedRoleId (one id from the list; pick the role that matches their CURRENT level, not entry-level if they're clearly beyond it)
+- yearsExperience (approximate number of years of professional/intern experience, or null)
+- seniority (one of: entry, junior, mid, senior, lead)
+- specialization (a short phrase for their niche, e.g. "Applied AI / LLM engineering", or null)
+- highlights (up to 3 short, concrete standout achievements from the resume)`;
 
     const parsed = await generateJSON<{
       fullName?: string;
@@ -40,9 +56,15 @@ Return JSON with keys:
       location?: string;
       skills?: string[];
       suggestedRoleId?: string;
+      yearsExperience?: number | null;
+      seniority?: ResumeParse["seniority"];
+      specialization?: string | null;
+      highlights?: string[];
     }>(prompt, {
       system:
-        "You extract clean, conservative structured data. Never invent skills not implied by the text.",
+        "You extract clean, accurate structured data from resumes. You recognise senior and specialised experience accurately and never under-level a strong candidate. You never invent experience that isn't there.",
+      strong: true, // use the stronger model — parsing quality matters for the demo
+      maxTokens: 4000,
     });
 
     if (parsed) {
@@ -51,8 +73,12 @@ Return JSON with keys:
         fullName: parsed.fullName ?? undefined,
         headline: parsed.headline ?? undefined,
         location: parsed.location ?? undefined,
-        skills: (parsed.skills ?? []).slice(0, 10),
+        skills: (parsed.skills ?? []).slice(0, 14),
         suggestedRoleId: validRole?.id,
+        yearsExperience: parsed.yearsExperience ?? undefined,
+        seniority: parsed.seniority,
+        specialization: parsed.specialization ?? undefined,
+        highlights: (parsed.highlights ?? []).slice(0, 3),
         usedAI: true,
       };
     }
@@ -61,31 +87,41 @@ Return JSON with keys:
   return { ...heuristicParse(text), usedAI: false };
 }
 
-// Deterministic fallback: scan for known skills and infer a likely role.
+// Deterministic fallback: scan for known skills and infer a likely role + level.
 function heuristicParse(text: string): Omit<ResumeParse, "usedAI"> {
   const lower = text.toLowerCase();
-  const skills = SKILLS.filter((s) => lower.includes(s.toLowerCase())).slice(0, 10);
+  const skills = SKILLS.filter((s) => lower.includes(s.toLowerCase())).slice(0, 14);
 
-  // Infer role by keyword signals, defaulting to graduate SWE.
+  // Estimate years from "YYYY – Present" / "X years" patterns.
+  let yearsExperience: number | undefined;
+  const yearsMatch = lower.match(/(\d+)\+?\s*years?/);
+  if (yearsMatch) yearsExperience = Number(yearsMatch[1]);
+
+  // Infer role + seniority by keyword signals.
   let suggestedRoleId = "r_grad_swe";
-  const signals: Array<[string[], string]> = [
-    [["senior", "lead", "architect"], "r_senior_swe"],
-    [["data scientist", "machine learning", "ml "], "r_data_scientist"],
-    [["data analyst", "analytics", "dashboard"], "r_data_analyst"],
-    [["product manager", "roadmap", "stakeholder"], "r_product_manager"],
-    [["designer", "figma", "ux"], "r_ux_designer"],
-    [["devops", "kubernetes", "terraform"], "r_devops"],
-    [["marketing", "seo", "campaign"], "r_marketing_exec"],
-    [["software engineer", "developer", "react", "node"], "r_swe"],
+  let seniority: ResumeParse["seniority"] = "entry";
+  const signals: Array<[string[], string, ResumeParse["seniority"]]> = [
+    [["ai engineer", "llm", "langchain", "bedrock", "rag"], "r_ml_engineer", "mid"],
+    [["machine learning engineer", "ml engineer", "mlops"], "r_ml_engineer", "mid"],
+    [["principal", "staff engineer"], "r_principal_eng", "lead"],
+    [["engineering manager", "team lead"], "r_eng_manager", "lead"],
+    [["data scientist"], "r_data_scientist", "mid"],
+    [["data analyst", "analytics", "dashboard"], "r_data_analyst", "junior"],
+    [["product manager", "roadmap"], "r_product_manager", "mid"],
+    [["designer", "figma", "ux"], "r_ux_designer", "junior"],
+    [["devops", "kubernetes", "terraform", "platform engineer"], "r_devops", "mid"],
+    [["marketing", "seo", "campaign"], "r_marketing_exec", "entry"],
+    [["senior software", "senior engineer", "architect"], "r_senior_swe", "senior"],
+    [["software engineer", "developer", "react", "node"], "r_swe", "junior"],
   ];
-  for (const [keys, role] of signals) {
+  for (const [keys, role, level] of signals) {
     if (keys.some((k) => lower.includes(k))) {
       suggestedRoleId = role;
+      seniority = level;
       break;
     }
   }
 
-  // Try to grab a name from the first non-empty line.
   const firstLine = text
     .split("\n")
     .map((l) => l.trim())
@@ -96,13 +132,13 @@ function heuristicParse(text: string): Omit<ResumeParse, "usedAI"> {
     "Petaling Jaya",
     "Cyberjaya",
     "Penang",
+    "George Town",
+    "Bayan Lepas",
     "Johor Bahru",
     "Shah Alam",
     "Subang",
   ];
-  const location = malaysianCities.find((c) =>
-    lower.includes(c.toLowerCase()),
-  );
+  const location = malaysianCities.find((c) => lower.includes(c.toLowerCase()));
 
   return {
     fullName: firstLine,
@@ -110,5 +146,9 @@ function heuristicParse(text: string): Omit<ResumeParse, "usedAI"> {
     location,
     skills,
     suggestedRoleId,
+    yearsExperience,
+    seniority,
+    specialization: undefined,
+    highlights: [],
   };
 }

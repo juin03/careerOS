@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useActionState, useEffect, useTransition } from "react";
+import { useState, useActionState, useEffect, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Loader2, Wand2, ArrowRight, Plus, X } from "lucide-react";
+import {
+  Sparkles,
+  Loader2,
+  Wand2,
+  ArrowRight,
+  Plus,
+  X,
+  Upload,
+  FileText,
+} from "lucide-react";
 import { toast } from "sonner";
+import { extractPdfText } from "@/lib/pdf-text";
 import {
   analyzeResume,
   saveProfile,
@@ -66,12 +76,47 @@ export function OnboardingFlow({
   const [roleId, setRoleId] = useState("");
   const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState("");
+  // AI read summary (display-only, shows the parse was intelligent).
+  const [aiRead, setAiRead] = useState<{
+    seniority?: string;
+    specialization?: string;
+    yearsExperience?: number;
+    highlights?: string[];
+  } | null>(null);
 
   const [parsing, startParsing] = useTransition();
+  const [extracting, setExtracting] = useState(false);
+  const [uploadedName, setUploadedName] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [saveState, saveActionFn, saving] = useActionState<
     SaveProfileState,
     FormData
   >(saveProfile, {});
+
+  // Extract text from an uploaded PDF and drop it into the textarea.
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file.");
+      return;
+    }
+    setExtracting(true);
+    try {
+      const text = await extractPdfText(file);
+      if (text.length < 30) {
+        toast.error("Couldn't read much text from that PDF — try pasting instead.");
+        return;
+      }
+      if (textareaRef.current) textareaRef.current.value = text;
+      setUploadedName(file.name);
+      toast.success("Resume read from PDF — now parse it.");
+    } catch {
+      toast.error("Failed to read the PDF. Try pasting the text instead.");
+    } finally {
+      setExtracting(false);
+    }
+  }
 
   // Parse the resume in an event handler (not an effect) and hydrate the form.
   function handleParse(formData: FormData) {
@@ -86,6 +131,14 @@ export function OnboardingFlow({
       if (result.location) setLocation(result.location);
       if (result.suggestedRoleId) setRoleId(result.suggestedRoleId);
       if (result.skills?.length) setSkills(result.skills);
+      if (result.usedAI) {
+        setAiRead({
+          seniority: result.seniority,
+          specialization: result.specialization,
+          yearsExperience: result.yearsExperience,
+          highlights: result.highlights,
+        });
+      }
       setStep(2);
       toast.success(
         result.usedAI
@@ -125,16 +178,54 @@ export function OnboardingFlow({
               Let&apos;s read your resume
             </CardTitle>
             <CardDescription>
-              Paste your resume and we&apos;ll extract your skills and current
-              role — so the map is about you, not a generic template.
+              Upload your CV (PDF) or paste it — we&apos;ll extract your skills
+              and current role so the map is about you, not a template.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form action={handleParse} className="space-y-4">
+              {/* PDF upload dropzone */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  handleFile(e.dataTransfer.files?.[0]);
+                }}
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-6 text-center transition-colors hover:border-primary/50 hover:bg-accent/50"
+              >
+                {extracting ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                ) : uploadedName ? (
+                  <FileText className="h-6 w-6 text-primary" />
+                ) : (
+                  <Upload className="h-6 w-6 text-muted-foreground" />
+                )}
+                <span className="text-sm font-medium">
+                  {extracting
+                    ? "Reading your PDF…"
+                    : uploadedName
+                      ? uploadedName
+                      : "Upload your CV (PDF)"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Drag &amp; drop or click — or paste below
+                </span>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => handleFile(e.target.files?.[0])}
+              />
+
               <Textarea
+                ref={textareaRef}
                 name="resumeText"
-                rows={12}
-                placeholder="Paste your resume here…"
+                rows={10}
+                placeholder="…or paste your resume here"
                 defaultValue=""
                 className="resize-none font-mono text-xs"
                 required
@@ -142,10 +233,9 @@ export function OnboardingFlow({
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  onClick={(e) => {
-                    const ta = (e.currentTarget.closest("form") as HTMLFormElement)
-                      .elements.namedItem("resumeText") as HTMLTextAreaElement;
-                    ta.value = SAMPLE_RESUME;
+                  onClick={() => {
+                    if (textareaRef.current)
+                      textareaRef.current.value = SAMPLE_RESUME;
                   }}
                   className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                 >
@@ -184,6 +274,43 @@ export function OnboardingFlow({
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {aiRead && (
+              <div className="mb-4 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  What the AI read
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {aiRead.specialization && (
+                    <Badge variant="secondary">{aiRead.specialization}</Badge>
+                  )}
+                  {aiRead.seniority && (
+                    <Badge variant="outline" className="capitalize">
+                      {aiRead.seniority} level
+                    </Badge>
+                  )}
+                  {typeof aiRead.yearsExperience === "number" &&
+                    aiRead.yearsExperience > 0 && (
+                      <Badge variant="outline">
+                        ~{aiRead.yearsExperience} yr experience
+                      </Badge>
+                    )}
+                </div>
+                {aiRead.highlights && aiRead.highlights.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {aiRead.highlights.map((h, i) => (
+                      <li
+                        key={i}
+                        className="flex gap-1.5 text-xs text-muted-foreground"
+                      >
+                        <span className="text-primary">•</span>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             <form action={saveActionFn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full name</Label>

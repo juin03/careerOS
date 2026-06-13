@@ -107,6 +107,10 @@ export interface ParseState {
   location?: string;
   skills?: string[];
   suggestedRoleId?: string;
+  yearsExperience?: number;
+  seniority?: "entry" | "junior" | "mid" | "senior" | "lead";
+  specialization?: string;
+  highlights?: string[];
   usedAI?: boolean;
   error?: string;
 }
