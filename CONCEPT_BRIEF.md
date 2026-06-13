@@ -1,84 +1,93 @@
 # Career OS — Concept Brief
 
-**Team audience focus:** Candidates (primary) + Employers, with a University lens.
-**Modules:** Career Path Navigator (Candidates 01) + Smart Talent Matching (Employers 01)
-+ Lifelong Outcome Loop (Universities 01) — delivered as one system, not three.
+**Primary audience:** Candidates
+**Module:** Career Path Navigator (Candidates · 01) — extended across one shared
+graph into Smart Talent Matching (Employers · 01) and Lifelong Outcome Loop
+(Universities · 01), plus a public Skills Demand Map wildcard.
+**Build scope:** Career OS core jobsite + the above modules, as one integrated system.
+**Live demo:** https://careeros-ruddy.vercel.app
 
 ---
 
-## The problem we're solving
+## What we're building
 
-Every system between graduates and opportunity sees only a fragment. Job boards see
-vacancies and optimise for application volume — which is exactly why both sides drown
-in spam and ghosting. ATS and matching systems are keyword filters: they match where
-someone has *been*, never where they're *heading*, which structurally punishes fresh
-graduates and career-switchers — precisely Talentbank's core audience. And nobody holds
-the long view. Every job search restarts from zero; a career is treated as a stack of
-disconnected applications rather than the 40-year arc it actually is.
+Career OS is a jobsite where the unit of matching is the **career path, not the
+keyword** — a navigation tool, not a prediction tool. It shows people the realistic
+routes ahead for someone of their shape, the trade-offs of each, and the next move
+that gets them there. The user keeps agency; we just give them better data than they
+could assemble alone.
 
-The result is cynicism on both sides and decisions made in the dark.
+The whole product is **one career-trajectory graph viewed from different sides** —
+roles, skills, and the weighted edges of how people actually move between jobs. That
+single data model is what makes everything cohere, and it's the heart of our build.
 
-## Our position
+## The problem
 
-Career OS is a **navigation tool, not a prediction tool**. It never tells anyone what
-their career *will* be. It shows the realistic paths available to people of a similar
-shape — skills, education, prior roles, geography — the trade-offs each path implies,
-and the next move that gets them there. The user keeps agency; we just give them better
-data than they could ever assemble alone. No black-box scores. No false precision.
-Uncertainty is stated in plain language.
+Every system between people and opportunity sees only a fragment. Job boards optimise
+for application *volume*, which is exactly why both sides drown in spam and ghosting.
+ATS and matching tools are keyword filters that match where someone has *been*, never
+where they're *heading* — structurally punishing fresh graduates and career-switchers,
+precisely Talentbank's audience. And nobody holds the long view: a career gets treated
+as a stack of disconnected applications rather than the 40-year arc it actually is.
 
-## The one idea that makes it coherent
+## How the one graph serves each audience
 
-We don't build three modules. We build **one career-trajectory graph and view it from
-three sides.** The same data model — roles, skills, and the weighted edges of how people
-actually move between them — becomes:
+**Candidates — Career Path Navigator (primary).** Instead of one "recommended job,"
+we render the **Landscape Map**: an interactive, multi-hop flow of where people like
+you realistically went next — each direction annotated with salary range (RM), typical
+time horizon, the specific skills between you and it, and an honest one-line trade-off.
+Thicker paths mean more people took them. Click any role to re-root the map and explore
+the whole graph hop by hop. Then a **personalised, AI-generated roadmap** turns a chosen
+destination into a concrete, phased plan around your actual skill gap. No black-box
+scores; ranges and plain-language reasons throughout.
 
-- **The candidate's Landscape Map.** Instead of a single "recommended job", we render
-  the landscape: where people like you went next, each direction annotated with its
-  salary range (in RM), typical time horizon, the specific skills between you and it,
-  and an honest one-line trade-off. Thicker paths mean more people took them. Then
-  **GPS rerouting**: pick a destination and real job listings surface as stepping
-  stones toward it; choose a different road and it recalculates.
+**Employers — Smart Talent Matching.** The same graph, read for fit. Candidates are
+ranked by *trajectory alignment* — how close their path is to the role and how much of
+the skill set they already hold — and **every match carries an explained reason**
+citing real evidence, never a naked percentage. Paired with **Quiet Signals**:
+candidates stay anonymous and findable, employers get a limited outreach budget, and
+each message must include a specific, AI-validated "why you" — so generic spam cannot
+get through. Identity is revealed only on accept. Scarcity plus forced specificity
+removes the noise that makes both sides cynical.
 
-- **The employer's Smart Matching.** The same graph, read for fit. Candidates are
-  ranked by *trajectory alignment* — how close their path is to the role and how much
-  of the skill set they already hold — and **every match carries an explained reason**,
-  citing the candidate's actual skills and trajectory. No naked percentages anywhere.
-  Paired with **Quiet Signals**: candidates can be findable yet anonymous, employers get
-  a limited outreach budget, and each message must include a specific, AI-validated
-  "why you" — generic spam literally cannot pass the gate. Identity is revealed only on
-  accept. Scarcity plus forced specificity kills the noise structurally.
+**Universities — Lifelong Outcome Loop.** The same graph read backward, per
+institution: graduate employability by field, starting salaries, at-risk programmes
+to intervene on, and curriculum-vs-market gaps. Outcome figures follow the Ministry of
+Higher Education's Graduate Tracer Study method; national benchmarks are pulled **live
+from the Department of Statistics Malaysia (DOSM) open data API**.
 
-- **The university's Outcome Loop.** The same graph, read backward and filtered to one
-  institution's alumni: where graduates actually flowed, which skill gaps recur against
-  market demand, and the live outcome flows — so teaching can be measured against reality
-  long after graduation day.
+**Wildcard — Skills Demand Map.** A public, downloadable view of where skills are in
+demand across Malaysia (e.g. Bayan Lepas embedded, Cyberjaya cloud), with real DOSM
+labour-market data and an open-data CSV export — for graduates, universities, and
+policymakers alike.
 
-This is the system-design answer: one schema, three honest lenses. Adding a fourth
-audience later means a new view, not a new product.
+## Why this fits the Career OS vision
 
-## Why this wins on the rubric
+The brief asks for one coherent thing, not a hedge. Our differentiator is the
+**connective tissue between all three audiences on a single graph** — the "One Career
+OS" thesis in Talentbank's own header. It maps directly to the heaviest scored
+criterion (System Design & Integration): adding a new audience is a new *view*, not a
+new product.
 
-- **Product & UX (30%):** solves the named problem (careers as transactions) with a
-  specific mechanic (path-as-the-unit-of-matching), for Talentbank's real audience.
-- **System Design (25%):** one coherent graph, multiple surfaces — the cleanest possible
-  integration story, and it visibly fits the broader Career OS pattern.
-- **Completeness (20%):** working end-to-end with real auth, a real Postgres database
-  with row-level security, and a live demo URL. Built to be directly integrable.
-- **AI Craft (15%):** three distinct, defensible LLM uses — resume→graph parsing,
-  uncertainty-calibrated path narration, and the spam-blocking outreach validator —
-  each with a deterministic fallback so the product is never brittle.
-- **Code Quality (10%):** typed throughout, versioned migrations, a pure-function engine
-  separated from UI, and documentation that reads cleanly to someone who didn't write it.
+## AI craft
 
-## What we deliberately left out
+Four distinct, defensible LLM uses (Azure OpenAI; o4-mini + gpt-5.4-mini), each with a
+deterministic fallback so nothing is brittle: resume → structured profile parsing
+(with PDF upload), uncertainty-calibrated path narration, personalised roadmap
+generation, and the Quiet Signals spam validator.
 
-No Fair Pay Engine, AI coach chatbot, onboarding predictor, or gamification. Each would
-be a *separate* idea bolted on; every one would dilute the single-graph story that makes
-the architecture coherent. The brief asks for a position, not a hedge — this is ours.
+## What we've already shipped (and the 28-day plan)
 
-## Tech
+The live demo already runs end-to-end: real Supabase auth + Postgres + row-level
+security, the full candidate and employer flows, the university and demand lenses,
+30 roles across tech, finance, healthcare, and business, and real DOSM data. The
+28-day build will deepen data integration (official DOSM occupational wage + Tracer
+datasets), add test coverage and accessibility hardening, and polish each surface to
+production quality — directly integrable, as the rubric defines it.
 
-Next.js 16 · React 19 · TypeScript · Tailwind v4 · shadcn/ui · React Flow (the map) ·
-Recharts (university analytics) · Supabase (Postgres, Auth, RLS) · Gemini for AI, with
-graceful fallback. Light/dark theme follows the system default.
+## Honest framing
+
+The trajectory graph is curated — no public source publishes Malaysian career
+transitions — but salaries follow the Tracer method and national figures are live from
+DOSM, with a documented path to full official ingestion. We'd rather state where the
+uncertainty sits than pretend it isn't there. That honesty is the product.
