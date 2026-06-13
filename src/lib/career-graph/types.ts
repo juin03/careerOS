@@ -9,7 +9,9 @@ export type RoleFamily =
   | "Marketing"
   | "Operations"
   | "Finance"
-  | "Leadership";
+  | "Leadership"
+  | "Healthcare"
+  | "Business";
 
 export interface Role {
   id: string;

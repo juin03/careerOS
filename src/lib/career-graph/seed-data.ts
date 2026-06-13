@@ -211,6 +211,144 @@ export const ROLES: Role[] = [
       "Leads multiple engineering teams and managers — org design, strategy, and delivery at scale.",
     skills: ["People Management", "Strategy", "Hiring", "Stakeholder Management", "System Design"],
   },
+
+  // ─── Finance & Accounting ────────────────────────────────────────────────
+  {
+    id: "r_audit_assoc",
+    title: "Audit Associate",
+    family: "Finance",
+    seniority: 1,
+    salaryMin: 3000,
+    salaryMax: 4500,
+    description:
+      "Entry into professional accounting — auditing client financials at a firm. A common first job for accounting and finance graduates, often while pursuing ACCA/CPA.",
+    skills: ["Accounting", "Excel", "Attention to Detail", "Audit", "Communication"],
+  },
+  {
+    id: "r_accountant",
+    title: "Accountant",
+    family: "Finance",
+    seniority: 2,
+    salaryMin: 4000,
+    salaryMax: 7000,
+    description:
+      "Owns the books for a company — reporting, reconciliation, and compliance. The backbone role of any finance function.",
+    skills: ["Accounting", "Excel", "Financial Reporting", "Taxation", "Attention to Detail"],
+  },
+  {
+    id: "r_financial_analyst",
+    title: "Financial Analyst",
+    family: "Finance",
+    seniority: 2,
+    salaryMin: 4500,
+    salaryMax: 8000,
+    description:
+      "Turns financial data into forecasts and decisions — budgeting, modelling, and analysis for the business.",
+    skills: ["Excel", "Financial Modelling", "Data Analysis", "Accounting", "Communication"],
+  },
+  {
+    id: "r_finance_manager",
+    title: "Finance Manager",
+    family: "Finance",
+    seniority: 3,
+    salaryMin: 9000,
+    salaryMax: 16000,
+    description:
+      "Leads the finance function — planning, controls, and the team. Trades hands-on bookkeeping for oversight and strategy.",
+    skills: ["Financial Reporting", "People Management", "Financial Modelling", "Strategy", "Stakeholder Management"],
+  },
+
+  // ─── Healthcare ──────────────────────────────────────────────────────────
+  {
+    id: "r_staff_nurse",
+    title: "Staff Nurse",
+    family: "Healthcare",
+    seniority: 1,
+    salaryMin: 2800,
+    salaryMax: 4500,
+    description:
+      "Frontline patient care in a hospital or clinic. The entry point for nursing graduates, with strong demand across Malaysia.",
+    skills: ["Patient Care", "Clinical Skills", "Communication", "Empathy", "Attention to Detail"],
+  },
+  {
+    id: "r_specialist_nurse",
+    title: "Specialist Nurse",
+    family: "Healthcare",
+    seniority: 2,
+    salaryMin: 4000,
+    salaryMax: 7000,
+    description:
+      "A nurse with advanced training in a specialty (ICU, theatre, paediatrics). More responsibility, more pay, more expertise.",
+    skills: ["Clinical Skills", "Patient Care", "Specialist Knowledge", "Mentoring", "Communication"],
+  },
+  {
+    id: "r_clinical_pharmacist",
+    title: "Pharmacist",
+    family: "Healthcare",
+    seniority: 2,
+    salaryMin: 4500,
+    salaryMax: 7500,
+    description:
+      "Dispenses and advises on medication in hospital or retail settings. A licensed, in-demand role for pharmacy graduates.",
+    skills: ["Pharmacology", "Patient Care", "Attention to Detail", "Communication", "Compliance"],
+  },
+  {
+    id: "r_health_admin",
+    title: "Healthcare Administrator",
+    family: "Healthcare",
+    seniority: 3,
+    salaryMin: 6000,
+    salaryMax: 12000,
+    description:
+      "Runs the operations of a clinic or hospital department — staffing, budgets, and quality. Where clinical experience meets management.",
+    skills: ["Operations", "People Management", "Healthcare Systems", "Stakeholder Management", "Process Design"],
+  },
+
+  // ─── Business, Sales & Marketing (broad) ─────────────────────────────────
+  {
+    id: "r_sales_exec",
+    title: "Sales Executive",
+    family: "Business",
+    seniority: 1,
+    salaryMin: 2800,
+    salaryMax: 5000,
+    description:
+      "Wins and grows accounts — the revenue engine of most companies. Open to graduates of any discipline; rewards drive and people skills.",
+    skills: ["Sales", "Communication", "Negotiation", "CRM", "Relationship Building"],
+  },
+  {
+    id: "r_account_manager",
+    title: "Account Manager",
+    family: "Business",
+    seniority: 2,
+    salaryMin: 4500,
+    salaryMax: 8500,
+    description:
+      "Owns client relationships end-to-end — retention, growth, and trust. The natural step up from sales.",
+    skills: ["Relationship Building", "Negotiation", "Communication", "CRM", "Stakeholder Management"],
+  },
+  {
+    id: "r_hr_exec",
+    title: "Human Resources Executive",
+    family: "Business",
+    seniority: 1,
+    salaryMin: 3000,
+    salaryMax: 5000,
+    description:
+      "Supports hiring, onboarding, and people operations. A people-centric entry role open to most graduates.",
+    skills: ["Recruitment", "Communication", "People Operations", "Empathy", "Process Design"],
+  },
+  {
+    id: "r_operations_manager",
+    title: "Operations Manager",
+    family: "Business",
+    seniority: 3,
+    salaryMin: 8000,
+    salaryMax: 15000,
+    description:
+      "Keeps the business running — processes, teams, and delivery. A broad leadership role many tracks converge into.",
+    skills: ["Operations", "People Management", "Process Design", "Strategy", "Stakeholder Management"],
+  },
 ];
 
 export const ROLE_BY_ID = Object.fromEntries(ROLES.map((r) => [r.id, r]));
@@ -467,6 +605,131 @@ export const TRANSITIONS: Transition[] = [
     medianMonths: 36,
     note: "Cross from the IC track to leading the org — only if you find you want the people side after all.",
   },
+
+  // ─── Finance & Accounting ────────────────────────────────────────────────
+  {
+    fromRoleId: "r_audit_assoc",
+    toRoleId: "r_accountant",
+    share: 0.48,
+    medianMonths: 24,
+    note: "The classic move once you've cleared exams — from auditing others' books to owning a company's.",
+  },
+  {
+    fromRoleId: "r_audit_assoc",
+    toRoleId: "r_financial_analyst",
+    share: 0.22,
+    medianMonths: 24,
+    note: "Toward analysis and forecasting. More forward-looking than audit, and a step toward corporate finance.",
+  },
+  {
+    fromRoleId: "r_accountant",
+    toRoleId: "r_finance_manager",
+    share: 0.4,
+    medianMonths: 36,
+    note: "Step up to leading the function. Less day-to-day bookkeeping, more planning and people.",
+  },
+  {
+    fromRoleId: "r_financial_analyst",
+    toRoleId: "r_finance_manager",
+    share: 0.35,
+    medianMonths: 30,
+    note: "From individual analysis to owning the numbers and the team.",
+  },
+  {
+    fromRoleId: "r_financial_analyst",
+    toRoleId: "r_data_analyst",
+    share: 0.12,
+    medianMonths: 18,
+    note: "A pivot into data for finance folk who enjoy the analytics more than the accounting.",
+  },
+  {
+    fromRoleId: "r_finance_manager",
+    toRoleId: "r_operations_manager",
+    share: 0.15,
+    medianMonths: 30,
+    note: "Broaden from finance into running operations — a path toward general management.",
+  },
+
+  // ─── Healthcare ──────────────────────────────────────────────────────────
+  {
+    fromRoleId: "r_staff_nurse",
+    toRoleId: "r_specialist_nurse",
+    share: 0.45,
+    medianMonths: 36,
+    note: "Specialise (ICU, theatre, paeds). More expertise and pay — the main growth path in nursing.",
+  },
+  {
+    fromRoleId: "r_staff_nurse",
+    toRoleId: "r_health_admin",
+    share: 0.14,
+    medianMonths: 48,
+    note: "Move from bedside to running the department. Trades clinical work for management.",
+  },
+  {
+    fromRoleId: "r_specialist_nurse",
+    toRoleId: "r_health_admin",
+    share: 0.25,
+    medianMonths: 42,
+    note: "Lead a unit or department, bringing deep clinical credibility to management.",
+  },
+  {
+    fromRoleId: "r_clinical_pharmacist",
+    toRoleId: "r_health_admin",
+    share: 0.16,
+    medianMonths: 48,
+    note: "Pharmacists who enjoy systems move into healthcare operations and leadership.",
+  },
+
+  // ─── Business, Sales & Marketing ─────────────────────────────────────────
+  {
+    fromRoleId: "r_sales_exec",
+    toRoleId: "r_account_manager",
+    share: 0.42,
+    medianMonths: 24,
+    note: "Grow from chasing new deals to owning and expanding key accounts.",
+  },
+  {
+    fromRoleId: "r_sales_exec",
+    toRoleId: "r_growth_manager",
+    share: 0.1,
+    medianMonths: 30,
+    note: "For sellers drawn to the data and marketing side of revenue.",
+  },
+  {
+    fromRoleId: "r_account_manager",
+    toRoleId: "r_operations_manager",
+    share: 0.2,
+    medianMonths: 36,
+    note: "Move from owning accounts to owning how the business delivers.",
+  },
+  {
+    fromRoleId: "r_account_manager",
+    toRoleId: "r_product_manager",
+    share: 0.12,
+    medianMonths: 30,
+    note: "Customer-facing AMs who know the product deeply sometimes cross into PM.",
+  },
+  {
+    fromRoleId: "r_hr_exec",
+    toRoleId: "r_operations_manager",
+    share: 0.18,
+    medianMonths: 36,
+    note: "From people operations to running operations broadly.",
+  },
+  {
+    fromRoleId: "r_hr_exec",
+    toRoleId: "r_biz_analyst",
+    share: 0.1,
+    medianMonths: 24,
+    note: "HR folk who enjoy data and process pivot into business analysis.",
+  },
+  {
+    fromRoleId: "r_operations_manager",
+    toRoleId: "r_director_eng",
+    share: 0.05,
+    medianMonths: 48,
+    note: "A rare jump for ops leaders in tech companies who grow toward org leadership.",
+  },
 ];
 
 export const COMPANIES: CompanySeed[] = [
@@ -480,6 +743,9 @@ export const COMPANIES: CompanySeed[] = [
   { id: "c_aerodyne", name: "Aerodyne", industry: "Drone Tech", location: "Cyberjaya", size: "501-1000" },
   { id: "c_kfit", name: "ClassPass APAC", industry: "Consumer Tech", location: "Kuala Lumpur", size: "201-500" },
   { id: "c_setel", name: "Setel", industry: "Fintech / Energy", location: "Kuala Lumpur", size: "201-500" },
+  { id: "c_kpmg", name: "KPMG Malaysia", industry: "Professional Services", location: "Kuala Lumpur", size: "1001-5000" },
+  { id: "c_kpj", name: "KPJ Healthcare", industry: "Healthcare", location: "Petaling Jaya", size: "5000+" },
+  { id: "c_nestle", name: "Nestlé Malaysia", industry: "FMCG", location: "Petaling Jaya", size: "5000+" },
 ];
 
 // Jobs are generated to cover most roles so the matching + listings feel alive.
@@ -703,6 +969,95 @@ export const JOBS: JobSeed[] = [
     salaryMax: 8500,
     description:
       "Learn product alongside senior PMs on a consumer app used daily across the region.",
+  },
+  // Non-tech listings so Finance, Healthcare, and Business tracks feel alive.
+  {
+    id: "j_kpmg_audit",
+    companyId: "c_kpmg",
+    roleId: "r_audit_assoc",
+    title: "Audit Associate (2026 intake)",
+    location: "Kuala Lumpur",
+    salaryMin: 3000,
+    salaryMax: 4200,
+    description:
+      "Start your professional accounting career auditing leading Malaysian companies. ACCA support provided. Open to accounting and finance graduates.",
+  },
+  {
+    id: "j_nestle_fa",
+    companyId: "c_nestle",
+    roleId: "r_financial_analyst",
+    title: "Financial Analyst, FP&A",
+    location: "Petaling Jaya",
+    salaryMin: 5000,
+    salaryMax: 8000,
+    description:
+      "Drive budgeting and forecasting for one of Malaysia's biggest FMCG brands. Strong Excel and modelling, real business influence.",
+  },
+  {
+    id: "j_maybank_fm",
+    companyId: "c_maybank",
+    roleId: "r_finance_manager",
+    title: "Finance Manager, Group Finance",
+    location: "Kuala Lumpur",
+    salaryMin: 10000,
+    salaryMax: 15000,
+    description:
+      "Lead a finance team within the country's largest bank — planning, controls, and reporting at scale.",
+  },
+  {
+    id: "j_kpj_nurse",
+    companyId: "c_kpj",
+    roleId: "r_staff_nurse",
+    title: "Staff Nurse",
+    location: "Petaling Jaya",
+    salaryMin: 2800,
+    salaryMax: 4200,
+    description:
+      "Provide frontline patient care at a leading private hospital group. New nursing graduates welcome; strong training and progression.",
+  },
+  {
+    id: "j_kpj_pharma",
+    companyId: "c_kpj",
+    roleId: "r_clinical_pharmacist",
+    title: "Pharmacist",
+    location: "Petaling Jaya",
+    salaryMin: 4500,
+    salaryMax: 7000,
+    description:
+      "Dispense and advise on medication across hospital wards. Licensed pharmacy graduates, with a clear path toward specialty and management.",
+  },
+  {
+    id: "j_nestle_sales",
+    companyId: "c_nestle",
+    roleId: "r_sales_exec",
+    title: "Sales Executive",
+    location: "Kuala Lumpur",
+    salaryMin: 3000,
+    salaryMax: 5000,
+    description:
+      "Grow accounts across the retail trade for household-name brands. Open to graduates of any discipline who love people and targets.",
+  },
+  {
+    id: "j_shopee_hr",
+    companyId: "c_shopee",
+    roleId: "r_hr_exec",
+    title: "Human Resources Executive",
+    location: "Kuala Lumpur",
+    salaryMin: 3200,
+    salaryMax: 5000,
+    description:
+      "Support hiring and people operations for a fast-moving tech org. A people-centric entry role open to most graduates.",
+  },
+  {
+    id: "j_grab_ops",
+    companyId: "c_grab",
+    roleId: "r_operations_manager",
+    title: "Operations Manager",
+    location: "Kuala Lumpur",
+    salaryMin: 9000,
+    salaryMax: 14000,
+    description:
+      "Own the processes and teams that keep a regional operation running. Broad leadership role for proven operators.",
   },
 ];
 

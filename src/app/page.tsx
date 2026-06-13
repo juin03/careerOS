@@ -49,16 +49,23 @@ export default function Home() {
             />
           </div>
 
-          {/* Secondary: public data view */}
+          {/* Secondary: public exploration views */}
           <p className="mt-6 text-sm text-muted-foreground">
             Just exploring?{" "}
+            <Link
+              href="/careers"
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Browse all careers
+            </Link>{" "}
+            or see the{" "}
             <Link
               href="/demand"
               className="font-medium text-primary underline-offset-4 hover:underline"
             >
-              See the Skills Demand Map
-            </Link>{" "}
-            — where skills are in demand across Malaysia.
+              Skills Demand Map
+            </Link>
+            .
           </p>
 
           {/* Demo hint */}
