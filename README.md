@@ -83,9 +83,34 @@ node scripts/seed-demo.mjs
 
 ### AI (optional)
 
-Set `GEMINI_API_KEY` in `.env.local` to enable AI resume parsing, path narration,
-and spam validation. Without it, the app falls back to deterministic heuristics —
-every feature still works.
+Set the Azure OpenAI vars in `.env.local` to enable AI resume parsing, path
+narration, roadmap generation, and Quiet Signals spam validation:
+
+```bash
+AZURE_OPENAI_BASE_URL=https://<resource>.openai.azure.com/openai/v1/
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_DEPLOYMENT=o4-mini          # default model
+AZURE_OPENAI_DEPLOYMENT_STRONG=gpt-5.4-mini  # used for roadmaps
+```
+
+Without them, the app falls back to deterministic heuristics — every feature
+still works.
+
+## Deployment (Vercel via GitHub Actions)
+
+CI/CD runs in `.github/workflows/deploy.yml`: every push/PR runs lint + build,
+then deploys to Vercel (production on `main`, preview on PRs) using the Vercel CLI.
+
+One-time setup:
+
+1. Create the Vercel project and link it locally: `npx vercel link`
+   (this writes `.vercel/project.json` with the org and project IDs).
+2. Add the six app env vars (Supabase + Azure) in the Vercel project's
+   **Settings → Environment Variables** (Production + Preview).
+3. Add three GitHub repo secrets (**Settings → Secrets and variables → Actions**):
+   `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+
+After that, every push to `main` ships to production automatically.
 
 ## Demo accounts
 
