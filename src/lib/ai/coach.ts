@@ -14,6 +14,7 @@ export interface CoachContext {
   skills: string[];
   summary: string | null;
   experience: { title: string; org: string; period: string }[];
+  yearsExperience: number;
 }
 
 export interface CoachReply {
@@ -26,7 +27,7 @@ export interface CoachReply {
 function contextBlock(ctx: CoachContext): string {
   const moves =
     ctx.seedRoleId &&
-    landscapeFrom(ctx.seedRoleId, ctx.skills)
+    landscapeFrom(ctx.seedRoleId, ctx.skills, ctx.yearsExperience)
       .slice(0, 5)
       .map(
         (m) =>
@@ -38,10 +39,11 @@ function contextBlock(ctx: CoachContext): string {
 
   return `The person you're coaching:
 - Current role: ${ctx.roleTitle ?? "not set"}
+- Years of experience: ${ctx.yearsExperience} (weight this heavily — a fresh grad with <1 year should NOT be told lead/manager roles are a near-term move)
 - Skills: ${ctx.skills.join(", ") || "none listed"}
 - Summary: ${ctx.summary ?? "n/a"}
 - Recent experience: ${ctx.experience.map((e) => `${e.title} at ${e.org}`).join("; ") || "n/a"}
-${moves ? `\nRealistic next moves from the career graph:\n${moves}` : ""}`;
+${moves ? `\nRealistic next moves from the career graph (already filtered for their seniority):\n${moves}` : ""}`;
 }
 
 export async function coachReply(

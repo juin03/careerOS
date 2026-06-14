@@ -13,12 +13,54 @@ export interface SkillGap {
   coverage: number; // 0..1 of the target role's skills the person already has
 }
 
+export type Reachability = "ready" | "stretch" | "early";
+
 export interface LandscapeMove {
   role: Role;
   transition: Transition;
   gap: SkillGap;
   salaryDeltaMin: number; // change vs current role's midpoint
   salaryDeltaMax: number;
+  // Seniority realism given the candidate's experience.
+  reachability: Reachability; // ready = natural next; stretch = ambitious; early = needs more years
+  reachabilityNote: string;
+}
+
+// Rough years of experience typically expected before stepping INTO a seniority
+// level. Used to keep path suggestions honest for early-career people.
+const YEARS_FOR_SENIORITY: Record<number, number> = {
+  1: 0,
+  2: 1,
+  3: 3,
+  4: 6,
+  5: 9,
+};
+
+function classifyReachability(
+  fromSeniority: number,
+  toRole: Role,
+  years: number,
+): { reachability: Reachability; note: string } {
+  const levelJump = toRole.seniority - fromSeniority;
+  const yearsExpected = YEARS_FOR_SENIORITY[toRole.seniority] ?? 0;
+
+  // A jump of 2+ seniority levels, or far short of the years usually needed.
+  if (levelJump >= 2 || years + 1.5 < yearsExpected) {
+    return {
+      reachability: "early",
+      note: `Usually needs ~${yearsExpected}+ years; a longer-term goal, not a direct next step.`,
+    };
+  }
+  if (levelJump === 1 && years + 0.5 < yearsExpected) {
+    return {
+      reachability: "stretch",
+      note: `An ambitious move — most make it around ${yearsExpected} years in.`,
+    };
+  }
+  return {
+    reachability: "ready",
+    note: "A realistic next step from where you are now.",
+  };
 }
 
 export function getRole(id: string | null | undefined): Role | undefined {
@@ -45,23 +87,38 @@ export function skillGap(have: string[], target: Role): SkillGap {
 export function landscapeFrom(
   currentRoleId: string,
   skills: string[],
+  years = 2, // candidate's years of experience; defaults to mid if unknown
 ): LandscapeMove[] {
   const current = getRole(currentRoleId);
   if (!current) return [];
   const currentMid = midpoint(current);
 
+  const rank: Record<Reachability, number> = { ready: 0, stretch: 1, early: 2 };
+
   return TRANSITIONS.filter((t) => t.fromRoleId === currentRoleId)
     .map((t) => {
       const role = getRole(t.toRoleId)!;
+      const { reachability, note } = classifyReachability(
+        current.seniority,
+        role,
+        years,
+      );
       return {
         role,
         transition: t,
         gap: skillGap(skills, role),
         salaryDeltaMin: role.salaryMin - currentMid,
         salaryDeltaMax: role.salaryMax - currentMid,
+        reachability,
+        reachabilityNote: note,
       };
     })
-    .sort((a, b) => b.transition.share - a.transition.share);
+    // Realistic next steps first; long-term goals last. Within a tier, by share.
+    .sort(
+      (a, b) =>
+        rank[a.reachability] - rank[b.reachability] ||
+        b.transition.share - a.transition.share,
+    );
 }
 
 // A two-level career tree: current role -> next moves -> the moves after those.
@@ -74,12 +131,13 @@ export interface TreeMove extends LandscapeMove {
 export function landscapeTree(
   currentRoleId: string,
   skills: string[],
-  opts: { maxFirst?: number; maxSecond?: number } = {},
+  opts: { maxFirst?: number; maxSecond?: number; years?: number } = {},
 ): TreeMove[] {
   const maxFirst = opts.maxFirst ?? 4;
   const maxSecond = opts.maxSecond ?? 2;
+  const years = opts.years ?? 2;
 
-  const first = landscapeFrom(currentRoleId, skills).slice(0, maxFirst);
+  const first = landscapeFrom(currentRoleId, skills, years).slice(0, maxFirst);
   const seen = new Set<string>([currentRoleId, ...first.map((m) => m.role.id)]);
   const tree: TreeMove[] = first.map((m) => ({
     ...m,
@@ -88,7 +146,8 @@ export function landscapeTree(
   }));
 
   for (const m of first) {
-    const second = landscapeFrom(m.role.id, skills)
+    // From the next role, the candidate would have ~that role's expected years.
+    const second = landscapeFrom(m.role.id, skills, years + 2)
       .filter((s) => !seen.has(s.role.id)) // avoid cycles / dupes across branches
       .slice(0, maxSecond);
     for (const s of second) {

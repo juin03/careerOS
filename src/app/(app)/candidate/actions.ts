@@ -142,11 +142,21 @@ export async function analyzeResume(
     return { error: "Paste a bit more of your resume so we can read it." };
   }
   const user = await getSessionUser();
+  const result = await parseResume(text);
+
   if (user) {
     const supabase = await createClient();
-    await supabase.from("profiles").update({ resume_text: text }).eq("id", user.id);
+    await supabase
+      .from("profiles")
+      .update({
+        resume_text: text,
+        // Persist years so the landscape can be seniority-realistic.
+        ...(typeof result.yearsExperience === "number"
+          ? { years_experience: result.yearsExperience }
+          : {}),
+      })
+      .eq("id", user.id);
   }
-  const result = await parseResume(text);
   return { ...result };
 }
 

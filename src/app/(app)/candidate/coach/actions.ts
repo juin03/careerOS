@@ -39,6 +39,7 @@ export async function sendCoachMessage(message: string): Promise<CoachSendResult
         org: e.org,
         period: e.period,
       })),
+      yearsExperience: shape.yearsExperience,
     },
     (history ?? []).map((h) => ({
       role: h.role as "user" | "assistant",

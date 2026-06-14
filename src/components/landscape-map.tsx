@@ -33,6 +33,9 @@ export interface LandscapeMoveDTO {
   // Tree position (1 = direct next move, 2 = the move after that).
   depth?: 1 | 2;
   parentRoleId?: string;
+  // Seniority realism vs the candidate's experience.
+  reachability?: "ready" | "stretch" | "early";
+  reachabilityNote?: string;
 }
 
 interface CurrentDTO {
@@ -109,7 +112,21 @@ function MoveNode({
           {pct(move.share)}
         </span>
       </div>
-      <div className="mt-1 text-xs text-muted-foreground">{move.family}</div>
+      <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+        <span>{move.family}</span>
+        {move.reachability && move.reachability !== "ready" && (
+          <span
+            className={cn(
+              "rounded px-1 py-px text-[9px] font-semibold uppercase",
+              move.reachability === "stretch"
+                ? "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            {move.reachability === "stretch" ? "Stretch" : "Long-term"}
+          </span>
+        )}
+      </div>
       <div className="mt-2 flex items-center gap-1 text-xs">
         {trend === "up" && <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />}
         {trend === "down" && <TrendingDown className="h-3.5 w-3.5 text-amber-500" />}

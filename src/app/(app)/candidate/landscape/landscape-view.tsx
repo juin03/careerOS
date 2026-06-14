@@ -22,6 +22,7 @@ import { RoadmapDialog } from "./roadmap-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { rmRange, rmDelta, months, pct } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function LandscapeView({
   current,
@@ -157,6 +158,25 @@ function MoveDetail({
           sub="of what's needed"
         />
       </div>
+
+      {/* Reachability — honest about seniority vs. the candidate's experience */}
+      {move.reachability && move.reachability !== "ready" && (
+        <div
+          className={cn(
+            "rounded-lg p-3 text-sm",
+            move.reachability === "stretch"
+              ? "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+              : "bg-muted/60",
+          )}
+        >
+          <p className="font-medium">
+            {move.reachability === "stretch"
+              ? "Ambitious move"
+              : "Longer-term goal"}
+          </p>
+          <p className="mt-1 text-muted-foreground">{move.reachabilityNote}</p>
+        </div>
+      )}
 
       {/* Trade-off note */}
       <div className="rounded-lg bg-muted/50 p-3 text-sm">

@@ -27,6 +27,7 @@ export default async function CoachPage() {
     skills: shape.skills,
     summary: shape.summary,
     experience: [],
+    yearsExperience: shape.yearsExperience,
   });
 
   return (

@@ -15,6 +15,7 @@ export interface CandidateShape {
   summary: string | null;
   experience: { title: string; org: string; period: string; highlights: string[] }[];
   achievements: { title: string; detail: string }[];
+  yearsExperience: number; // drives seniority-aware path realism
   isComplete: boolean;
 }
 
@@ -54,6 +55,7 @@ export async function getCandidateShape(
       (profile.experience as CandidateShape["experience"] | null) ?? [],
     achievements:
       (profile.achievements as CandidateShape["achievements"] | null) ?? [],
+    yearsExperience: profile.years_experience ?? 2,
     isComplete: Boolean(seedRoleId && skills.length > 0),
   };
 }

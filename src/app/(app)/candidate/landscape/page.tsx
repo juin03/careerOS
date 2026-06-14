@@ -27,7 +27,9 @@ export default async function LandscapePage({
   const current = getRole(rootRoleId)!;
   // The map (tree) is instant pure-engine data; the AI narration streams in
   // separately via Suspense so the page is interactive immediately.
-  const tree = landscapeTree(rootRoleId, shape.skills);
+  const tree = landscapeTree(rootRoleId, shape.skills, {
+    years: shape.yearsExperience,
+  });
 
   const moveDTOs: LandscapeMoveDTO[] = tree.map((m) => ({
     roleId: m.role.id,
@@ -45,6 +47,8 @@ export default async function LandscapePage({
     salaryDeltaMax: m.salaryDeltaMax,
     depth: m.depth,
     parentRoleId: m.parentRoleId,
+    reachability: m.reachability,
+    reachabilityNote: m.reachabilityNote,
   }));
 
   return (

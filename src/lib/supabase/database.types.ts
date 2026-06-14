@@ -264,6 +264,7 @@ export type Database = {
           summary: string | null
           university: string | null
           updated_at: string
+          years_experience: number | null
         }
         Insert: {
           account_role?: Database["public"]["Enums"]["account_role"]
@@ -281,6 +282,7 @@ export type Database = {
           summary?: string | null
           university?: string | null
           updated_at?: string
+          years_experience?: number | null
         }
         Update: {
           account_role?: Database["public"]["Enums"]["account_role"]
@@ -298,6 +300,7 @@ export type Database = {
           summary?: string | null
           university?: string | null
           updated_at?: string
+          years_experience?: number | null
         }
         Relationships: [
           {
