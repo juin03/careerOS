@@ -111,8 +111,11 @@ export function OnboardingFlow({
       if (textareaRef.current) textareaRef.current.value = text;
       setUploadedName(file.name);
       toast.success("Resume read from PDF — now parse it.");
-    } catch {
-      toast.error("Failed to read the PDF. Try pasting the text instead.");
+    } catch (err) {
+      console.error("PDF extraction failed:", err);
+      toast.error(
+        `Couldn't read that PDF: ${err instanceof Error ? err.message : "unknown error"}. Try pasting instead.`,
+      );
     } finally {
       setExtracting(false);
     }
