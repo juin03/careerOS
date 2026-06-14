@@ -19,10 +19,12 @@ import {
   outcomeFlows,
 } from "@/lib/university-analytics";
 import { UNIVERSITIES, getUniversity } from "@/lib/career-graph/universities";
+import { buildInsights, dataSources } from "@/lib/university-insights";
 import { UniversityCharts } from "./university-charts";
 import { UniversityPicker } from "./university-picker";
 import { getLabourSnapshot } from "@/lib/dosm";
 import { pct, rm } from "@/lib/format";
+import { Lightbulb, Database } from "lucide-react";
 
 export const metadata = {
   title: "University view · Career OS",
@@ -54,6 +56,10 @@ export default async function UniversityPage({
   const families = cohortByFamily(cohort);
   const gaps = recurringSkillGaps(cohort);
   const flows = outcomeFlows(cohort);
+
+  // Actionable, per-field insights and the honest data-onboarding story.
+  const insights = buildInsights(uni);
+  const sources = dataSources();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -158,6 +164,46 @@ export default async function UniversityPage({
           </div>
         </div>
 
+        {/* Actionable insights — "what to do", not just "what happened" */}
+        <div>
+          <h2 className="mb-3 flex items-center gap-2 font-semibold">
+            <Lightbulb className="h-4 w-4 text-primary" />
+            Recommended actions
+          </h2>
+          <div className="space-y-3">
+            {insights.map((ins, i) => (
+              <div
+                key={i}
+                className="flex gap-3 rounded-xl border bg-card p-4"
+              >
+                <span
+                  className={`mt-0.5 inline-flex h-fit shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                    ins.severity === "act-now"
+                      ? "bg-destructive/10 text-destructive"
+                      : ins.severity === "watch"
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  }`}
+                >
+                  {ins.severity === "act-now"
+                    ? "Act now"
+                    : ins.severity === "watch"
+                      ? "Watch"
+                      : "Strength"}
+                </span>
+                <div>
+                  <p className="text-sm font-medium">{ins.field}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{ins.finding}</p>
+                  <p className="mt-1.5 text-sm">
+                    <span className="font-medium text-primary">Do: </span>
+                    {ins.action}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* National context, live from DOSM */}
         {labour && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card p-4">
@@ -174,6 +220,38 @@ export default async function UniversityPage({
         )}
 
         <UniversityCharts families={families} gaps={gaps} flows={flows} />
+
+        {/* Honest data-onboarding story — answers "how do you get UM/USM's data?" */}
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <Database className="h-4 w-4 text-primary" />
+            Where this data comes from
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A real university doesn&apos;t start from scratch — most of this data
+            already exists. Career OS connects to it.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {sources.map((s) => (
+              <div key={s.name} className="rounded-lg border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium">{s.name}</span>
+                  <Badge
+                    variant={s.status === "live" ? "default" : "outline"}
+                    className="text-[10px] capitalize"
+                  >
+                    {s.status === "live"
+                      ? "Live now"
+                      : s.status === "method"
+                        ? "Existing dataset"
+                        : "On integration"}
+                  </Badge>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">{s.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="rounded-xl border bg-primary/5 p-5">
           <h2 className="font-semibold">Why this is the same system</h2>
