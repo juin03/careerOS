@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Sparkles,
   Building2,
+  Plus,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,9 @@ export interface JobDTO {
   applied: boolean;
   stepRank: "next-step" | "on-path" | "destination" | "off-path";
   skillCoverage: number | null;
+  matchedSkills: string[];
+  missingSkills: string[];
+  trajectoryNote: string | null;
 }
 
 interface TargetInfo {
@@ -209,6 +213,56 @@ function JobCard({
           {job.description}
         </p>
       )}
+
+      {/* Explainable fit — no black-box score. Shows exactly what matches and
+          what to build, so the candidate knows how to move beyond it. */}
+      {job.skillCoverage !== null &&
+        (job.matchedSkills.length > 0 || job.missingSkills.length > 0) && (
+          <div className="mt-3 rounded-lg bg-muted/40 p-3">
+            <p className="text-xs font-medium">
+              Why {pct(job.skillCoverage)}: you have{" "}
+              {job.matchedSkills.length} of{" "}
+              {job.matchedSkills.length + job.missingSkills.length} skills this role
+              looks for.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {job.matchedSkills.map((s) => (
+                <Badge key={s} variant="secondary" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                  {s}
+                </Badge>
+              ))}
+              {job.missingSkills.map((s) => (
+                <Badge
+                  key={s}
+                  variant="outline"
+                  className="gap-1 border-dashed text-muted-foreground"
+                >
+                  <Plus className="h-3 w-3" />
+                  {s}
+                </Badge>
+              ))}
+            </div>
+            {job.missingSkills.length > 0 && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                To move beyond this: build{" "}
+                <span className="font-medium text-foreground">
+                  {job.missingSkills.slice(0, 2).join(" and ")}
+                </span>
+                {job.missingSkills.length > 2
+                  ? `, plus ${job.missingSkills.length - 2} more`
+                  : ""}
+                .{" "}
+                <Link
+                  href={`/candidate/landscape`}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
+                  See your roadmap →
+                </Link>
+              </p>
+            )}
+          </div>
+        )}
 
       <div className="mt-4 flex items-center justify-between">
         <span className="text-xs text-muted-foreground">

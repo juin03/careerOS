@@ -23,10 +23,24 @@ export async function saveProfile(
   const university = String(formData.get("university") ?? "").trim();
   const currentRoleId = String(formData.get("currentRoleId") ?? "").trim();
   const findability = String(formData.get("findability") ?? "open");
+  const summary = String(formData.get("summary") ?? "").trim();
   const skills = String(formData.get("skills") ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+
+  // Portfolio (experience + achievements) round-trips through the form as JSON.
+  function parseJsonField<T>(name: string): T | undefined {
+    const raw = String(formData.get(name) ?? "").trim();
+    if (!raw) return undefined;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return undefined;
+    }
+  }
+  const experience = parseJsonField<unknown[]>("experience");
+  const achievements = parseJsonField<unknown[]>("achievements");
 
   const supabase = await createClient();
 
@@ -54,8 +68,9 @@ export async function saveProfile(
       university: university || null,
       current_role_id: dbRoleId,
       findability: findability as "open" | "quiet" | "closed",
-      // Store the seed role id + skills in resume_text-adjacent columns is messy;
-      // we persist skills relationally below and keep the seed id in headline meta.
+      summary: summary || null,
+      ...(experience !== undefined ? { experience: experience as never } : {}),
+      ...(achievements !== undefined ? { achievements: achievements as never } : {}),
     })
     .eq("id", user.id);
 
@@ -111,6 +126,9 @@ export interface ParseState {
   seniority?: "entry" | "junior" | "mid" | "senior" | "lead";
   specialization?: string;
   highlights?: string[];
+  summary?: string;
+  experience?: { title: string; org: string; period: string; highlights: string[] }[];
+  achievements?: { title: string; detail: string }[];
   usedAI?: boolean;
   error?: string;
 }

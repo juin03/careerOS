@@ -24,6 +24,9 @@ export async function buildRoadmap(input: {
     toRoleId: input.targetRoleId,
     skills: shape.skills,
     company: input.company?.trim() || undefined,
+    // Closed loop: the AI plans around the candidate's real history.
+    experience: shape.experience,
+    achievements: shape.achievements,
   });
 
   if (!roadmap) return { error: "Could not generate a roadmap for that target." };

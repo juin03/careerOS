@@ -183,43 +183,52 @@ export type Database = {
       profiles: {
         Row: {
           account_role: Database["public"]["Enums"]["account_role"]
+          achievements: Json
           company_id: string | null
           created_at: string
           current_role_id: string | null
+          experience: Json
           findability: Database["public"]["Enums"]["findability"]
           full_name: string | null
           headline: string | null
           id: string
           location: string | null
           resume_text: string | null
+          summary: string | null
           university: string | null
           updated_at: string
         }
         Insert: {
           account_role?: Database["public"]["Enums"]["account_role"]
+          achievements?: Json
           company_id?: string | null
           created_at?: string
           current_role_id?: string | null
+          experience?: Json
           findability?: Database["public"]["Enums"]["findability"]
           full_name?: string | null
           headline?: string | null
           id: string
           location?: string | null
           resume_text?: string | null
+          summary?: string | null
           university?: string | null
           updated_at?: string
         }
         Update: {
           account_role?: Database["public"]["Enums"]["account_role"]
+          achievements?: Json
           company_id?: string | null
           created_at?: string
           current_role_id?: string | null
+          experience?: Json
           findability?: Database["public"]["Enums"]["findability"]
           full_name?: string | null
           headline?: string | null
           id?: string
           location?: string | null
           resume_text?: string | null
+          summary?: string | null
           university?: string | null
           updated_at?: string
         }

@@ -36,6 +36,8 @@ export async function generateRoadmap(input: {
   toRoleId: string;
   skills: string[];
   company?: string;
+  experience?: { title: string; org: string; period: string; highlights: string[] }[];
+  achievements?: { title: string; detail: string }[];
 }): Promise<Roadmap | null> {
   const from = getRole(input.fromRoleId);
   const to = getRole(input.toRoleId);
@@ -51,6 +53,16 @@ export async function generateRoadmap(input: {
       ? `The user is specifically targeting a role at ${input.company}. Tailor advice to what that kind of employer values.`
       : "";
 
+    // Feed the candidate's real history so the plan builds on what they've done.
+    const expLine = input.experience?.length
+      ? `Their actual experience:\n${input.experience
+          .map((e) => `- ${e.title} at ${e.org} (${e.period}): ${e.highlights.slice(0, 2).join("; ")}`)
+          .join("\n")}`
+      : "";
+    const achLine = input.achievements?.length
+      ? `Notable achievements: ${input.achievements.map((a) => a.title).join("; ")}.`
+      : "";
+
     const prompt = `Create a personalised career roadmap.
 
 Current role: ${from.title} (${from.family})
@@ -59,7 +71,11 @@ Likely path through the graph: ${viaRoles}
 Skills the user ALREADY has: ${input.skills.join(", ") || "none listed"}
 Skills the target needs that they're MISSING: ${gap.missing.join(", ") || "none — mostly experience"}
 Typical time to make this move: about ${months} months.
+${expLine}
+${achLine}
 ${companyLine}
+
+Build on what they've already done — reference their real experience and achievements where relevant, and don't recommend things they've clearly already demonstrated.
 
 Produce a phased roadmap (like roadmap.sh, but specific to THIS person's gap).
 Rules:

@@ -1,6 +1,18 @@
 import { generateJSON, hasAI } from "./provider";
 import { ROLES, SKILLS } from "@/lib/career-graph/seed-data";
 
+export interface ExperienceItem {
+  title: string;
+  org: string;
+  period: string;
+  highlights: string[];
+}
+
+export interface AchievementItem {
+  title: string;
+  detail: string;
+}
+
 export interface ResumeParse {
   fullName?: string;
   headline?: string;
@@ -12,6 +24,10 @@ export interface ResumeParse {
   seniority?: "entry" | "junior" | "mid" | "senior" | "lead";
   specialization?: string; // e.g. "Applied AI / LLM engineering"
   highlights?: string[]; // standout achievements pulled from the resume
+  // Living Portfolio: structured experience + achievements for employers to see.
+  summary?: string;
+  experience?: ExperienceItem[];
+  achievements?: AchievementItem[];
   usedAI: boolean;
 }
 
@@ -48,7 +64,10 @@ Return JSON:
 - yearsExperience (approximate number of years of professional/intern experience, or null)
 - seniority (one of: entry, junior, mid, senior, lead)
 - specialization (a short phrase for their niche, e.g. "Applied AI / LLM engineering", or null)
-- highlights (up to 3 short, concrete standout achievements from the resume)`;
+- highlights (up to 3 short, concrete standout achievements from the resume)
+- summary (2-3 sentence professional summary in third person, for an employer-facing portfolio)
+- experience (array of roles, most recent first, each: { "title", "org", "period", "highlights": [up to 3 concrete bullet points] })
+- achievements (array of standout wins beyond day jobs — awards, hackathons, competitions, leadership — each: { "title", "detail" })`;
 
     const parsed = await generateJSON<{
       fullName?: string;
@@ -60,11 +79,14 @@ Return JSON:
       seniority?: ResumeParse["seniority"];
       specialization?: string | null;
       highlights?: string[];
+      summary?: string | null;
+      experience?: ExperienceItem[];
+      achievements?: AchievementItem[];
     }>(prompt, {
       system:
         "You extract clean, accurate structured data from resumes. You recognise senior and specialised experience accurately and never under-level a strong candidate. You never invent experience that isn't there.",
       strong: true, // use the stronger model — parsing quality matters for the demo
-      maxTokens: 4000,
+      maxTokens: 6000,
     });
 
     if (parsed) {
@@ -79,6 +101,9 @@ Return JSON:
         seniority: parsed.seniority,
         specialization: parsed.specialization ?? undefined,
         highlights: (parsed.highlights ?? []).slice(0, 3),
+        summary: parsed.summary ?? undefined,
+        experience: (parsed.experience ?? []).slice(0, 6),
+        achievements: (parsed.achievements ?? []).slice(0, 6),
         usedAI: true,
       };
     }

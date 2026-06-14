@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Inbox, MapPin, CheckCircle2, Sparkles } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -46,6 +47,7 @@ export default async function ApplicantsPage() {
               roles: { title: string } | null;
             } | null;
             const cand = app.candidate as {
+              id: string;
               full_name: string | null;
               headline: string | null;
               location: string | null;
@@ -75,7 +77,16 @@ export default async function ApplicantsPage() {
                     <PersonAvatar name={cand?.full_name} seed={cand?.full_name ?? undefined} />
                     <div>
                       <h3 className="font-semibold">
-                        {cand?.full_name ?? "Candidate"}
+                        {cand?.id ? (
+                          <Link
+                            href={`/employer/candidate/${cand.id}`}
+                            className="hover:text-primary hover:underline underline-offset-4"
+                          >
+                            {cand.full_name ?? "Candidate"}
+                          </Link>
+                        ) : (
+                          (cand?.full_name ?? "Candidate")
+                        )}
                       </h3>
                       {cand?.headline && (
                         <p className="text-sm text-muted-foreground">

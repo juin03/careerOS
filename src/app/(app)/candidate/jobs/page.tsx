@@ -55,6 +55,9 @@ export default async function JobsPage({
       applied: applied.has(j.id),
       stepRank,
       skillCoverage: match?.skillCoverage ?? null,
+      matchedSkills: match?.matchedSkills ?? [],
+      missingSkills: match?.missingSkills ?? [],
+      trajectoryNote: match?.trajectoryNote ?? null,
     };
   });
 

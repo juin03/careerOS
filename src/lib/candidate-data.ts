@@ -11,6 +11,10 @@ export interface CandidateShape {
   seedRoleId: string | null; // engine-friendly id, e.g. "r_swe"
   roleTitle: string | null;
   skills: string[];
+  // Portfolio (Living Portfolio) — feeds AI recommendations for the closed loop.
+  summary: string | null;
+  experience: { title: string; org: string; period: string; highlights: string[] }[];
+  achievements: { title: string; detail: string }[];
   isComplete: boolean;
 }
 
@@ -45,6 +49,11 @@ export async function getCandidateShape(
     seedRoleId,
     roleTitle,
     skills,
+    summary: profile.summary ?? null,
+    experience:
+      (profile.experience as CandidateShape["experience"] | null) ?? [],
+    achievements:
+      (profile.achievements as CandidateShape["achievements"] | null) ?? [],
     isComplete: Boolean(seedRoleId && skills.length > 0),
   };
 }

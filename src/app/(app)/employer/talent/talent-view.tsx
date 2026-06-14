@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   MapPin,
   GraduationCap,
@@ -8,7 +9,9 @@ import {
   EyeOff,
   Route,
   Sparkles,
+  FileText,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -203,7 +206,15 @@ function CandidateCard({
         ))}
       </div>
 
-      <div className="mt-4 flex justify-end">
+      <div className="mt-4 flex items-center justify-end gap-2">
+        {!c.anonymized && (
+          <Button asChild variant="ghost" size="sm" className="gap-1.5">
+            <Link href={`/employer/candidate/${c.id}`}>
+              <FileText className="h-3.5 w-3.5" />
+              View portfolio
+            </Link>
+          </Button>
+        )}
         <SignalDialog
           candidateId={c.id}
           candidateName={displayName}

@@ -2,6 +2,10 @@ import { requireProfile } from "@/lib/auth";
 import { getCandidateShape } from "@/lib/candidate-data";
 import { ROLES } from "@/lib/career-graph/seed-data";
 import { ProfileEditor } from "./profile-editor";
+import type {
+  ExperienceItem,
+  AchievementItem,
+} from "@/lib/ai/resume";
 
 export default async function ProfilePage() {
   const profile = await requireProfile("candidate");
@@ -12,7 +16,7 @@ export default async function ProfilePage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Your profile</h1>
         <p className="mt-1 text-muted-foreground">
-          This is your shape — the whole platform reads from it.
+          Your shape and portfolio — what the map reads from, and what employers see.
         </p>
       </div>
       <ProfileEditor
@@ -25,6 +29,9 @@ export default async function ProfilePage() {
           roleId: shape.seedRoleId ?? "",
           skills: shape.skills,
           findability: profile.findability,
+          summary: profile.summary ?? "",
+          experience: (profile.experience as ExperienceItem[] | null) ?? [],
+          achievements: (profile.achievements as AchievementItem[] | null) ?? [],
         }}
       />
     </div>
