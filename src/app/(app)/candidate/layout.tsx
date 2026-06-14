@@ -1,4 +1,13 @@
-import { LayoutDashboard, Map, Briefcase, FileText, UserCircle, Inbox } from "lucide-react";
+import {
+  LayoutDashboard,
+  Map,
+  Route,
+  MessageCircle,
+  Briefcase,
+  FileText,
+  UserCircle,
+  Inbox,
+} from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ensureSeed } from "@/lib/seed-db";
@@ -7,6 +16,8 @@ import { AppShell, type NavItem } from "@/components/app-shell";
 const nav: NavItem[] = [
   { href: "/candidate", label: "Overview", icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: "/candidate/landscape", label: "Landscape Map", icon: <Map className="h-4 w-4" /> },
+  { href: "/candidate/roadmaps", label: "My Roadmaps", icon: <Route className="h-4 w-4" /> },
+  { href: "/candidate/coach", label: "AI Coach", icon: <MessageCircle className="h-4 w-4" /> },
   { href: "/candidate/jobs", label: "Jobs", icon: <Briefcase className="h-4 w-4" /> },
   { href: "/candidate/applications", label: "Applications", icon: <FileText className="h-4 w-4" /> },
   { href: "/candidate/signals", label: "Quiet Signals", icon: <Inbox className="h-4 w-4" /> },

@@ -56,6 +56,38 @@ export type Database = {
           },
         ]
       }
+      coach_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          profile_id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          profile_id: string
+          role: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_messages_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -143,6 +175,41 @@ export type Database = {
             columns: ["role_id"]
             isOneToOne: false
             referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      narration_cache: {
+        Row: {
+          created_at: string
+          profile_id: string
+          root_role_id: string
+          shape_hash: string
+          text: string
+          used_ai: boolean
+        }
+        Insert: {
+          created_at?: string
+          profile_id: string
+          root_role_id: string
+          shape_hash: string
+          text: string
+          used_ai?: boolean
+        }
+        Update: {
+          created_at?: string
+          profile_id?: string
+          root_role_id?: string
+          shape_hash?: string
+          text?: string
+          used_ai?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "narration_cache_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -245,6 +312,59 @@ export type Database = {
             columns: ["current_role_id"]
             isOneToOne: false
             referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roadmaps: {
+        Row: {
+          company: string | null
+          created_at: string
+          done_steps: Json
+          from_role: string
+          id: string
+          phases: Json
+          profile_id: string
+          summary: string | null
+          to_role: string
+          to_role_id: string | null
+          total_months: number | null
+          used_ai: boolean
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          done_steps?: Json
+          from_role: string
+          id?: string
+          phases?: Json
+          profile_id: string
+          summary?: string | null
+          to_role: string
+          to_role_id?: string | null
+          total_months?: number | null
+          used_ai?: boolean
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          done_steps?: Json
+          from_role?: string
+          id?: string
+          phases?: Json
+          profile_id?: string
+          summary?: string | null
+          to_role?: string
+          to_role_id?: string | null
+          total_months?: number | null
+          used_ai?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmaps_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
