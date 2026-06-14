@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Inbox, MapPin, CheckCircle2, Sparkles } from "lucide-react";
+import { Inbox, MapPin, CheckCircle2, Sparkles, ArrowUpRight } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ROLES } from "@/lib/career-graph/seed-data";
@@ -74,15 +74,28 @@ export default async function ApplicantsPage() {
               <div key={app.id} className="rounded-xl border bg-card p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex gap-3">
-                    <PersonAvatar name={cand?.full_name} seed={cand?.full_name ?? undefined} />
+                    {cand?.id ? (
+                      <Link href={`/employer/candidate/${cand.id}`}>
+                        <PersonAvatar
+                          name={cand.full_name}
+                          seed={cand.full_name ?? undefined}
+                        />
+                      </Link>
+                    ) : (
+                      <PersonAvatar
+                        name={cand?.full_name}
+                        seed={cand?.full_name ?? undefined}
+                      />
+                    )}
                     <div>
                       <h3 className="font-semibold">
                         {cand?.id ? (
                           <Link
                             href={`/employer/candidate/${cand.id}`}
-                            className="hover:text-primary hover:underline underline-offset-4"
+                            className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
                           >
                             {cand.full_name ?? "Candidate"}
+                            <ArrowUpRight className="h-3.5 w-3.5" />
                           </Link>
                         ) : (
                           (cand?.full_name ?? "Candidate")

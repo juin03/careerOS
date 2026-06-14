@@ -68,14 +68,19 @@ Their message: "${userMessage}"
 
 Reply as their career coach. Rules:
 - Ground every point in their actual position and the graph data above. Be specific.
-- Navigation, not prediction — show options and trade-offs, never "you will".
-- Be warm, concise (under 120 words), and practical. No corporate fluff.
+- Navigation, not prediction — present the LANDSCAPE of realistic options, not a
+  single verdict. When they ask "what next", give 2-3 genuine paths with the
+  honest trade-off of each (pay, time, effort, risk), then note which fits their
+  current shape best — but leave the choice to them. Never collapse to one answer.
+- Be warm and practical. No corporate fluff.
+- Format for readability: use **bold** for key terms/roles, and a short bullet
+  list when comparing options or listing steps. Keep it tight (under ~150 words).
 - If they mention a skill they have that isn't listed, you may suggest adding it.`;
 
   const text =
     (await generateText(prompt, {
       system:
-        "You are a senior career mentor who has watched this person's field for decades. You are honest, specific, and never generic. You empower; you don't pressure.",
+        "You are a senior career mentor who has watched this person's field for decades. You are honest, specific, and never generic. You show people the range of paths open to them and the trade-offs of each — you never reduce a career to one 'correct' move. You empower; you don't pressure. You write in clean markdown (bold, bullet lists) so replies are easy to scan.",
       strong: true,
       maxTokens: 2000,
     })) ?? "I couldn't generate a reply just now — try rephrasing?";

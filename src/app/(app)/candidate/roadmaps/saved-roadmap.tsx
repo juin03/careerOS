@@ -5,7 +5,6 @@ import { Route, Clock, Building2, Check, Circle, Trash2, ChevronDown } from "luc
 import { toast } from "sonner";
 import { toggleRoadmapStep, deleteRoadmap } from "@/app/(app)/candidate/landscape/roadmap-action";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { months } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -139,9 +138,12 @@ export function SavedRoadmap({ roadmap }: { roadmap: SavedRoadmapData }) {
                         {step.skills.length > 0 && (
                           <div className="mt-1.5 flex flex-wrap gap-1">
                             {step.skills.map((s) => (
-                              <Badge key={s} variant="secondary" className="text-[10px]">
+                              <span
+                                key={s}
+                                className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
+                              >
                                 {s}
-                              </Badge>
+                              </span>
                             ))}
                           </div>
                         )}

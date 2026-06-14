@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useTransition } from "react";
 import { Send, Loader2, MessageCircle, Sparkles, Plus, Check } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import {
   sendCoachMessage,
@@ -137,7 +138,28 @@ export function CoachChat({
                   : "border bg-card",
               )}
             >
-              {m.content}
+              {m.role === "assistant" ? (
+                <div className="prose-coach space-y-2">
+                  <ReactMarkdown
+                    components={{
+                      strong: ({ children }) => (
+                        <span className="font-semibold text-foreground">{children}</span>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="my-1 ml-4 list-disc space-y-1">{children}</ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="my-1 ml-4 list-decimal space-y-1">{children}</ol>
+                      ),
+                      p: ({ children }) => <p className="[&:not(:first-child)]:mt-2">{children}</p>,
+                    }}
+                  >
+                    {m.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                m.content
+              )}
             </div>
           </div>
         ))}

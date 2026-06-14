@@ -16,7 +16,6 @@ import type { Roadmap } from "@/lib/ai/roadmap";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -156,10 +155,13 @@ function RoadmapView({
                       {step.skills.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {step.skills.map((s) => (
-                            <Badge key={s} variant="secondary" className="gap-1 text-[10px]">
-                              <CheckCircle2 className="h-2.5 w-2.5 text-emerald-500" />
+                            <span
+                              key={s}
+                              className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
+                            >
+                              <CheckCircle2 className="h-2.5 w-2.5" />
                               {s}
-                            </Badge>
+                            </span>
                           ))}
                         </div>
                       )}

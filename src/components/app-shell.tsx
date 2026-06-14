@@ -64,7 +64,7 @@ export function AppShell({
       </header>
 
       <div className="flex flex-1">
-        <aside className="hidden w-60 shrink-0 border-r p-4 md:block">
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-60 shrink-0 overflow-y-auto border-r p-4 md:block">
           <SideNav nav={nav} />
         </aside>
         <main className="flex-1 overflow-x-hidden">{children}</main>
