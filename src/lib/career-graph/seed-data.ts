@@ -98,6 +98,17 @@ export const ROLES: Role[] = [
       "Productionises models — the overlap of data science and software engineering.",
     skills: ["Python", "Machine Learning", "Cloud", "System Design", "Docker"],
   },
+  {
+    id: "r_ai_engineer",
+    title: "AI Engineer",
+    family: "Data",
+    seniority: 2,
+    salaryMin: 6000,
+    salaryMax: 13000,
+    description:
+      "Builds applications on top of foundation models — LLM agents, RAG pipelines, and AI automation. The fastest-growing engineering role; distinct from ML engineering in that it productionises existing models rather than training them.",
+    skills: ["Python", "LLM", "RAG", "Cloud", "Prompt Engineering", "System Design"],
+  },
   // Product & Design
   {
     id: "r_product_manager",
@@ -506,6 +517,49 @@ export const TRANSITIONS: Transition[] = [
     share: 0.21,
     medianMonths: 24,
     note: "Growth and product blur at the senior end. A common consolidation of the two.",
+  },
+  // ── AI Engineer paths (into and out of) ──────────────────────────────────
+  {
+    fromRoleId: "r_swe",
+    toRoleId: "r_ai_engineer",
+    share: 0.14,
+    medianMonths: 18,
+    note: "The hottest pivot right now — software engineers who pick up LLMs, RAG, and agents move fast into AI engineering.",
+  },
+  {
+    fromRoleId: "r_grad_swe",
+    toRoleId: "r_ai_engineer",
+    share: 0.08,
+    medianMonths: 20,
+    note: "Increasingly a first destination for grads who build with foundation models early.",
+  },
+  {
+    fromRoleId: "r_ai_engineer",
+    toRoleId: "r_senior_swe",
+    share: 0.26,
+    medianMonths: 24,
+    note: "Broaden back into senior engineering with AI as a deep specialty — a strong, well-paid generalist path.",
+  },
+  {
+    fromRoleId: "r_ai_engineer",
+    toRoleId: "r_ml_engineer",
+    share: 0.22,
+    medianMonths: 24,
+    note: "Go deeper into the modelling side — training and fine-tuning, not just building on top of models. Expect to study the maths.",
+  },
+  {
+    fromRoleId: "r_ai_engineer",
+    toRoleId: "r_ai_lead",
+    share: 0.18,
+    medianMonths: 30,
+    note: "Lead an applied-AI team. More architecture and direction, still close to the technology.",
+  },
+  {
+    fromRoleId: "r_ai_engineer",
+    toRoleId: "r_product_manager",
+    share: 0.1,
+    medianMonths: 28,
+    note: "AI PMs who can speak both languages are rare and valuable. A real shift from building to deciding.",
   },
   // ── Paths out of the senior roles (so no role is a dead end) ──────────────
   // ML Engineer
@@ -1058,6 +1112,17 @@ export const JOBS: JobSeed[] = [
     salaryMax: 14000,
     description:
       "Own the processes and teams that keep a regional operation running. Broad leadership role for proven operators.",
+  },
+  {
+    id: "j_bigpay_ai",
+    companyId: "c_bigpay",
+    roleId: "r_ai_engineer",
+    title: "AI Engineer, LLM Products",
+    location: "Kuala Lumpur",
+    salaryMin: 7000,
+    salaryMax: 13000,
+    description:
+      "Build production LLM features — agents, RAG over internal docs, and AI automation on AWS Bedrock. For engineers who ship with foundation models.",
   },
 ];
 

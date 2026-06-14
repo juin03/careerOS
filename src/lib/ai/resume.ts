@@ -126,8 +126,8 @@ function heuristicParse(text: string): Omit<ResumeParse, "usedAI"> {
   let suggestedRoleId = "r_grad_swe";
   let seniority: ResumeParse["seniority"] = "entry";
   const signals: Array<[string[], string, ResumeParse["seniority"]]> = [
-    [["ai engineer", "llm", "langchain", "bedrock", "rag"], "r_ml_engineer", "mid"],
-    [["machine learning engineer", "ml engineer", "mlops"], "r_ml_engineer", "mid"],
+    [["ai engineer", "llm", "langchain", "langgraph", "bedrock", "rag", "ai agent"], "r_ai_engineer", "junior"],
+    [["machine learning engineer", "ml engineer", "mlops", "model training", "fine-tun"], "r_ml_engineer", "mid"],
     [["principal", "staff engineer"], "r_principal_eng", "lead"],
     [["engineering manager", "team lead"], "r_eng_manager", "lead"],
     [["data scientist"], "r_data_scientist", "mid"],

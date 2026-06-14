@@ -77,9 +77,14 @@ function SideNav({ nav }: { nav: NavItem[] }) {
   const pathname = usePathname();
   return (
     <nav className="space-y-1">
-      {nav.map((item) => {
+      {nav.map((item, i) => {
+        // The first item is the section index (e.g. /candidate). It must match
+        // EXACTLY, otherwise it stays highlighted on every sub-page since they
+        // all start with its href. Deeper items use prefix matching.
         const active =
-          pathname === item.href || pathname.startsWith(item.href + "/");
+          i === 0
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Link
             key={item.href}
