@@ -16,6 +16,8 @@ export interface RoadmapResult {
 export async function buildRoadmap(input: {
   targetRoleId: string;
   company?: string;
+  jobId?: string;
+  jobTitle?: string;
 }): Promise<RoadmapResult> {
   const profile = await requireProfile("candidate");
   const shape = await getCandidateShape(profile);
@@ -34,12 +36,20 @@ export async function buildRoadmap(input: {
 
   if (!roadmap) return { error: "Could not generate a roadmap for that target." };
 
+  // Title: job-specific if generated from a listing, else role-to-role.
+  const title = input.jobTitle
+    ? `Path to ${input.jobTitle}${input.company ? ` @ ${input.company}` : ""}`
+    : `${roadmap.fromRole} → ${roadmap.toRole}`;
+
   // Persist it so it becomes a living, trackable plan.
   const supabase = await createClient();
   const { data } = await supabase
     .from("roadmaps")
     .insert({
       profile_id: profile.id,
+      title,
+      job_id: input.jobId ?? null,
+      job_title: input.jobTitle ?? null,
       from_role: roadmap.fromRole,
       to_role: roadmap.toRole,
       to_role_id: input.targetRoleId,

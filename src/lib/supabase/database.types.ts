@@ -326,9 +326,12 @@ export type Database = {
           done_steps: Json
           from_role: string
           id: string
+          job_id: string | null
+          job_title: string | null
           phases: Json
           profile_id: string
           summary: string | null
+          title: string | null
           to_role: string
           to_role_id: string | null
           total_months: number | null
@@ -340,9 +343,12 @@ export type Database = {
           done_steps?: Json
           from_role: string
           id?: string
+          job_id?: string | null
+          job_title?: string | null
           phases?: Json
           profile_id: string
           summary?: string | null
+          title?: string | null
           to_role: string
           to_role_id?: string | null
           total_months?: number | null
@@ -354,15 +360,25 @@ export type Database = {
           done_steps?: Json
           from_role?: string
           id?: string
+          job_id?: string | null
+          job_title?: string | null
           phases?: Json
           profile_id?: string
           summary?: string | null
+          title?: string | null
           to_role?: string
           to_role_id?: string | null
           total_months?: number | null
           used_ai?: boolean
         }
         Relationships: [
+          {
+            foreignKeyName: "roadmaps_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "roadmaps_profile_id_fkey"
             columns: ["profile_id"]

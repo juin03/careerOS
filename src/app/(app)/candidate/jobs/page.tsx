@@ -87,6 +87,7 @@ export default async function JobsPage({
           : null
       }
       query={params.q ?? ""}
+      currentRoleTitle={shape.roleTitle}
     />
   );
 }

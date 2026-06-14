@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApplyDialog } from "./apply-dialog";
+import { RoadmapDialog } from "@/app/(app)/candidate/landscape/roadmap-dialog";
 import { rmRange, pct } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -50,10 +51,12 @@ export function JobsView({
   jobs,
   target,
   query,
+  currentRoleTitle,
 }: {
   jobs: JobDTO[];
   target: TargetInfo | null;
   query: string;
+  currentRoleTitle: string | null;
 }) {
   const [q, setQ] = useState(query);
 
@@ -138,7 +141,12 @@ export function JobsView({
           </p>
         )}
         {filtered.map((job) => (
-          <JobCard key={job.id} job={job} routing={Boolean(target)} />
+          <JobCard
+            key={job.id}
+            job={job}
+            routing={Boolean(target)}
+            currentRoleTitle={currentRoleTitle}
+          />
         ))}
       </div>
     </div>
@@ -148,9 +156,11 @@ export function JobsView({
 function JobCard({
   job,
   routing,
+  currentRoleTitle,
 }: {
   job: JobDTO;
   routing: boolean;
+  currentRoleTitle: string | null;
 }) {
   return (
     <div
@@ -264,22 +274,38 @@ function JobCard({
           </div>
         )}
 
-      <div className="mt-4 flex items-center justify-between">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-muted-foreground">
           {job.roleTitle ?? "Role"}
         </span>
-        {job.applied ? (
-          <Badge variant="secondary" className="gap-1">
-            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-            Applied
-          </Badge>
-        ) : (
-          <ApplyDialog
-            jobId={job.id}
-            jobTitle={job.title}
-            companyName={job.companyName}
-          />
-        )}
+        <div className="flex items-center gap-2">
+          {job.seedRoleId && currentRoleTitle && (
+            <div className="w-44">
+              <RoadmapDialog
+                targetRoleId={job.seedRoleId}
+                targetTitle={job.roleTitle ?? job.title}
+                fromTitle={currentRoleTitle}
+                jobId={job.id}
+                jobTitle={job.title}
+                jobCompany={job.companyName ?? undefined}
+                triggerLabel="Path to this job"
+                triggerVariant="outline"
+              />
+            </div>
+          )}
+          {job.applied ? (
+            <Badge variant="secondary" className="gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+              Applied
+            </Badge>
+          ) : (
+            <ApplyDialog
+              jobId={job.id}
+              jobTitle={job.title}
+              companyName={job.companyName}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -30,19 +30,35 @@ export function RoadmapDialog({
   targetRoleId,
   targetTitle,
   fromTitle,
+  jobId,
+  jobTitle,
+  jobCompany,
+  triggerLabel = "Generate my roadmap",
+  triggerVariant = "outline",
 }: {
   targetRoleId: string;
   targetTitle: string;
   fromTitle: string;
+  // When launched from a job listing, the roadmap is titled + tied to that job.
+  jobId?: string;
+  jobTitle?: string;
+  jobCompany?: string;
+  triggerLabel?: string;
+  triggerVariant?: "outline" | "default" | "ghost" | "secondary";
 }) {
   const [open, setOpen] = useState(false);
-  const [company, setCompany] = useState("");
+  const [company, setCompany] = useState(jobCompany ?? "");
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [pending, startTransition] = useTransition();
 
   function generate() {
     startTransition(async () => {
-      const res = await buildRoadmap({ targetRoleId, company });
+      const res = await buildRoadmap({
+        targetRoleId,
+        company,
+        jobId,
+        jobTitle,
+      });
       if (res.error) toast.error(res.error);
       else if (res.roadmap) setRoadmap(res.roadmap);
     });
@@ -57,19 +73,21 @@ export function RoadmapDialog({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full gap-2">
+        <Button variant={triggerVariant} className="w-full gap-2">
           <Route className="h-4 w-4" />
-          Generate my roadmap
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Route className="h-5 w-5 text-primary" />
-            Roadmap to {targetTitle}
+            {jobTitle ? `Path to ${jobTitle}` : `Roadmap to ${targetTitle}`}
           </DialogTitle>
           <DialogDescription>
-            A personalised plan from {fromTitle}, built around your skill gap.
+            {jobTitle
+              ? `A personalised plan to land this ${targetTitle} role, from ${fromTitle}.`
+              : `A personalised plan from ${fromTitle}, built around your skill gap.`}
           </DialogDescription>
         </DialogHeader>
 

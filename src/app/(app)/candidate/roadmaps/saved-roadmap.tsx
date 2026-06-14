@@ -21,6 +21,8 @@ interface Phase {
 }
 export interface SavedRoadmapData {
   id: string;
+  title: string | null;
+  jobTitle: string | null;
   fromRole: string;
   toRole: string;
   company: string | null;
@@ -71,9 +73,12 @@ export function SavedRoadmap({ roadmap }: { roadmap: SavedRoadmapData }) {
           </span>
           <div>
             <p className="font-medium">
-              {roadmap.fromRole} → {roadmap.toRole}
+              {roadmap.title ?? `${roadmap.fromRole} → ${roadmap.toRole}`}
             </p>
             <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span>
+                {roadmap.fromRole} → {roadmap.toRole}
+              </span>
               {roadmap.totalMonths && (
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" /> ~{months(roadmap.totalMonths)}

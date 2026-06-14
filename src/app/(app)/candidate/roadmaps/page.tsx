@@ -18,6 +18,8 @@ export default async function RoadmapsPage() {
 
   const roadmaps: SavedRoadmapData[] = (data ?? []).map((r) => ({
     id: r.id,
+    title: r.title,
+    jobTitle: r.job_title,
     fromRole: r.from_role,
     toRole: r.to_role,
     company: r.company,
