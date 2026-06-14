@@ -4,13 +4,11 @@
 // Client-side keeps the server stateless and avoids file-upload plumbing —
 // only the extracted text is sent on to the AI parser.
 //
-// The worker is loaded from a CDN pinned to the installed version, which is the
-// most robust option across bundlers (no build-time URL resolution needed).
-const PDFJS_VERSION = "6.0.227";
-
+// The worker is served from our own /public so the version always matches the
+// installed pdfjs-dist (CDNs lag new releases — 6.x 404s on cdnjs).
 export async function extractPdfText(file: File): Promise<string> {
   const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VERSION}/pdf.worker.min.mjs`;
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
   const buffer = await file.arrayBuffer();
   const doc = await pdfjs.getDocument({ data: buffer }).promise;

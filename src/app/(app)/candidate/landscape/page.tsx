@@ -1,9 +1,10 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { getCandidateShape } from "@/lib/candidate-data";
-import { landscapeFrom, landscapeTree, getRole } from "@/lib/career-graph/engine";
-import { narrateLandscape } from "@/lib/ai/narrate";
+import { landscapeTree, getRole } from "@/lib/career-graph/engine";
 import { LandscapeView } from "./landscape-view";
+import { LandscapeNarration, NarrationSkeleton } from "./narration";
 import type { LandscapeMoveDTO } from "@/components/landscape-map";
 
 export default async function LandscapePage({
@@ -24,10 +25,9 @@ export default async function LandscapePage({
     params.from && getRole(params.from) ? params.from : shape.seedRoleId;
 
   const current = getRole(rootRoleId)!;
-  // Narration reads the direct next moves; the map shows the two-level tree.
-  const directMoves = landscapeFrom(rootRoleId, shape.skills);
+  // The map (tree) is instant pure-engine data; the AI narration streams in
+  // separately via Suspense so the page is interactive immediately.
   const tree = landscapeTree(rootRoleId, shape.skills);
-  const narration = await narrateLandscape(current.title, directMoves);
 
   const moveDTOs: LandscapeMoveDTO[] = tree.map((m) => ({
     roleId: m.role.id,
@@ -55,10 +55,17 @@ export default async function LandscapePage({
         salaryMax: current.salaryMax,
       }}
       moves={moveDTOs}
-      narration={narration.text}
-      usedAI={narration.usedAI}
       exploring={exploring}
       homeRoleTitle={getRole(shape.seedRoleId)!.title}
+      narration={
+        <Suspense fallback={<NarrationSkeleton />}>
+          <LandscapeNarration
+            rootRoleId={rootRoleId}
+            roleTitle={current.title}
+            skills={shape.skills}
+          />
+        </Suspense>
+      }
     />
   );
 }

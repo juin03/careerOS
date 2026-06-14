@@ -16,6 +16,17 @@ export async function ensureSeed() {
   if (seeded) return;
   const supabase = await createClient();
 
+  // Fast path: if the graph is already fully seeded (it is, in production),
+  // a single count query lets us skip all the per-row existence checks/inserts.
+  // This is what runs on every cold serverless start, so keep it to one query.
+  const { count } = await supabase
+    .from("roles")
+    .select("*", { count: "exact", head: true });
+  if ((count ?? 0) >= ROLES.length && (count ?? 0) >= JOBS.length) {
+    seeded = true;
+    return;
+  }
+
   // ── Roles ──────────────────────────────────────────────────────────────
   const { data: existingRoles } = await supabase
     .from("roles")
