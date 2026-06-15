@@ -1,6 +1,7 @@
 import { Inbox } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { ApplicationsTabs } from "@/components/section-tabs";
 import { SignalCard } from "./signal-card";
 
 export default async function CandidateSignalsPage() {
@@ -17,6 +18,7 @@ export default async function CandidateSignalsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6">
+      <ApplicationsTabs className="-mx-4 px-4 sm:-mx-6 sm:px-6" />
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Quiet Signals</h1>
         <p className="mt-1 text-muted-foreground">

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { NavigateTabs } from "@/components/section-tabs";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessage {
@@ -83,6 +84,7 @@ export function CoachChat({
 
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col p-4 sm:p-6">
+      <NavigateTabs className="-mx-4 mb-4 px-4 sm:-mx-6 sm:px-6" />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">

@@ -10,7 +10,7 @@ import type { LandscapeMoveDTO } from "@/components/landscape-map";
 export default async function LandscapePage({
   searchParams,
 }: {
-  searchParams: Promise<{ from?: string }>;
+  searchParams: Promise<{ from?: string; trail?: string }>;
 }) {
   const params = await searchParams;
   const profile = await requireProfile("candidate");
@@ -23,6 +23,13 @@ export default async function LandscapePage({
   const exploring = Boolean(params.from && params.from !== shape.seedRoleId);
   const rootRoleId =
     params.from && getRole(params.from) ? params.from : shape.seedRoleId;
+
+  // The breadcrumb trail: the ordered ancestors the user explored through to
+  // reach this root, so they can step back to any of them (not just home).
+  const trail = (params.trail ? params.trail.split(",") : [])
+    .map((id) => id.trim())
+    .filter((id) => getRole(id) && id !== rootRoleId)
+    .map((id) => ({ roleId: id, title: getRole(id)!.title }));
 
   const current = getRole(rootRoleId)!;
   // The map (tree) is instant pure-engine data; the AI narration streams in
@@ -60,9 +67,10 @@ export default async function LandscapePage({
       }}
       moves={moveDTOs}
       exploring={exploring}
-      homeRoleTitle={getRole(shape.seedRoleId)!.title}
+      rootRoleId={rootRoleId}
+      trail={trail}
       narration={
-        <Suspense fallback={<NarrationSkeleton />}>
+        <Suspense key="landscape-narration" fallback={<NarrationSkeleton />}>
           <LandscapeNarration
             rootRoleId={rootRoleId}
             roleTitle={current.title}

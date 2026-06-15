@@ -264,10 +264,10 @@ function JobCard({
                   : ""}
                 .{" "}
                 <Link
-                  href={`/candidate/landscape`}
+                  href={job.seedRoleId ? `/candidate/path/${job.seedRoleId}?job=${job.id}` : `/candidate/landscape`}
                   className="text-primary underline-offset-4 hover:underline"
                 >
-                  See your roadmap →
+                  See your gap &amp; plan →
                 </Link>
               </p>
             )}
@@ -278,9 +278,15 @@ function JobCard({
         <span className="text-xs text-muted-foreground">
           {job.roleTitle ?? "Role"}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {job.seedRoleId && currentRoleTitle && (
-            <div className="w-44">
+            <>
+              <Button asChild variant="ghost" size="sm" className="gap-2">
+                <Link href={`/candidate/path/${job.seedRoleId}?job=${job.id}`}>
+                  <Navigation className="h-4 w-4" />
+                  See path &amp; gap
+                </Link>
+              </Button>
               <RoadmapDialog
                 targetRoleId={job.seedRoleId}
                 targetTitle={job.roleTitle ?? job.title}
@@ -288,10 +294,12 @@ function JobCard({
                 jobId={job.id}
                 jobTitle={job.title}
                 jobCompany={job.companyName ?? undefined}
-                triggerLabel="Path to this job"
+                triggerLabel="Skills to get this job"
                 triggerVariant="outline"
+                triggerClassName="w-auto"
+                triggerSize="sm"
               />
-            </div>
+            </>
           )}
           {job.applied ? (
             <Badge variant="secondary" className="gap-1">
@@ -303,6 +311,7 @@ function JobCard({
               jobId={job.id}
               jobTitle={job.title}
               companyName={job.companyName}
+              coverage={job.skillCoverage}
             />
           )}
         </div>

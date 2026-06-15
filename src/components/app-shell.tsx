@@ -23,7 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, UserCircle } from "lucide-react";
 import { initials } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/app/(auth)/actions";
@@ -32,6 +32,9 @@ export interface NavItem {
   href: string;
   label: string;
   icon: React.ReactNode;
+  // Extra path prefixes that should also mark this item active (for grouped
+  // sections reached via sub-tabs, e.g. Navigate covers roadmaps + coach).
+  match?: string[];
 }
 
 export function AppShell({
@@ -39,12 +42,14 @@ export function AppShell({
   name,
   email,
   roleLabel,
+  profileHref,
   children,
 }: {
   nav: NavItem[];
   name: string;
   email: string;
   roleLabel: string;
+  profileHref?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -59,7 +64,7 @@ export function AppShell({
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <UserMenu name={name} email={email} />
+          <UserMenu name={name} email={email} profileHref={profileHref} />
         </div>
       </header>
 
@@ -84,7 +89,12 @@ function SideNav({ nav }: { nav: NavItem[] }) {
         const active =
           i === 0
             ? pathname === item.href
-            : pathname === item.href || pathname.startsWith(item.href + "/");
+            : pathname === item.href ||
+              pathname.startsWith(item.href + "/") ||
+              (item.match?.some(
+                (m) => pathname === m || pathname.startsWith(m + "/"),
+              ) ??
+                false);
         return (
           <Link
             key={item.href}
@@ -124,7 +134,15 @@ function MobileNav({ nav }: { nav: NavItem[] }) {
   );
 }
 
-function UserMenu({ name, email }: { name: string; email: string }) {
+function UserMenu({
+  name,
+  email,
+  profileHref,
+}: {
+  name: string;
+  email: string;
+  profileHref?: string;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -146,6 +164,14 @@ function UserMenu({ name, email }: { name: string; email: string }) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {profileHref && (
+          <DropdownMenuItem asChild className="cursor-pointer">
+            <Link href={profileHref}>
+              <UserCircle className="mr-2 h-4 w-4" />
+              Profile
+            </Link>
+          </DropdownMenuItem>
+        )}
         <form action={signOut}>
           <button type="submit" className="w-full">
             <DropdownMenuItem className="cursor-pointer">

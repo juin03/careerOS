@@ -73,4 +73,57 @@ for (const name of ["TypeScript", "React", "Node.js", "SQL", "Git"]) {
 // Employer company link
 await fetch(`${URL}/rest/v1/profiles?id=eq.${emp.uid}`, { method: "PATCH", headers: h(emp.token), body: JSON.stringify({ full_name: "Imran (Talent, Grab)", company_id: compIdMap["c_grab"] ?? null }) });
 
+// ── Example Quiet Signals to the demo candidate ───────────────────────────
+// Realistic, specific outreach (the anti-spam value prop) from a few different
+// companies. Each extra employer is its own account so the inbox shows distinct
+// companies; the profile row is auto-created by the handle_new_user trigger.
+async function ensureEmployer(email, fullName, companyDbId) {
+  let token, uid;
+  const su = await (await fetch(`${URL}/auth/v1/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", apikey: KEY },
+    body: JSON.stringify({ email, password: "demo1234", data: { full_name: fullName, account_role: "employer" } }),
+  })).json();
+  if (su.access_token) { token = su.access_token; uid = su.user?.id; }
+  else { const li = await login(email, "demo1234"); token = li.token; uid = li.uid; }
+  if (!token || !uid) return null;
+  // Set recruiter name + company (account_role comes from signup metadata).
+  await fetch(`${URL}/rest/v1/profiles?id=eq.${uid}`, { method: "PATCH", headers: h(token), body: JSON.stringify({ full_name: fullName, company_id: companyDbId ?? null }) });
+  return { token, uid };
+}
+
+const existingSignals = await (await fetch(`${URL}/rest/v1/signals?candidate_id=eq.${cand.uid}&select=id`, { headers: h(T) })).json();
+if (Array.isArray(existingSignals) && existingSignals.length > 0) {
+  console.log("signals already present:", existingSignals.length, "- skipping");
+} else {
+  let made = 0;
+  // The existing Grab employer — already accepted, so it shows as "Connected".
+  {
+    const res = await fetch(`${URL}/rest/v1/signals`, { method: "POST", headers: h(emp.token), body: JSON.stringify({
+      employer_id: emp.uid, candidate_id: cand.uid, accepted: true,
+      why_you: "Aisyah, your path from Software Engineer toward senior in fintech lines up with our Payments team. You already have the core we hire for — TypeScript, React, Node.js and SQL. Let's talk.",
+    }) });
+    if (res.status === 201) made++;
+  }
+  // Other companies — pending outreach.
+  const examples = [
+    { email: "talent.shopee@careeros.demo", recruiter: "Wei Ling (Talent, Shopee)", companyId: "c_shopee",
+      why: "Aisyah — your two years shipping React + TypeScript in fintech is exactly the profile our payments web team wants. With your Node.js background you could own features end-to-end here. Worth a chat?" },
+    { email: "talent.bigpay@careeros.demo", recruiter: "Daniel (Eng Hiring, BigPay)", companyId: "c_bigpay",
+      why: "We're a fintech scaling our money-movement platform, and your exact stack — React, Node.js, SQL — maps straight onto what we need. Your fintech experience means a short ramp-up. Keen to tell you more." },
+    { email: "talent.carsome@careeros.demo", recruiter: "Priya (Recruiting, Carsome)", companyId: "c_carsome",
+      why: "Your React and TypeScript depth stood out. We're rebuilding our checkout flow and want someone who's shipped real product in production — your trajectory fits what we're after." },
+  ];
+  for (const ex of examples) {
+    const e = await ensureEmployer(ex.email, ex.recruiter, compIdMap[ex.companyId]);
+    if (!e) { console.log("skip employer", ex.email); continue; }
+    const res = await fetch(`${URL}/rest/v1/signals`, { method: "POST", headers: h(e.token), body: JSON.stringify({
+      employer_id: e.uid, candidate_id: cand.uid, accepted: null, why_you: ex.why,
+    }) });
+    if (res.status === 201) made++;
+    else console.log("signal insert failed", ex.email, res.status, await res.text());
+  }
+  console.log("signals added:", made);
+}
+
 console.log("demo profiles set. DONE");

@@ -21,10 +21,14 @@ export function ApplyDialog({
   jobId,
   jobTitle,
   companyName,
+  coverage,
 }: {
   jobId: string;
   jobTitle: string;
   companyName: string | null;
+  // Optional honest-readiness signal (0..1). When present, the dialog frames the
+  // application around how ready you are — never a hard gate, just honesty.
+  coverage?: number | null;
 }) {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
@@ -43,6 +47,27 @@ export function ApplyDialog({
     });
   }
 
+  const readiness =
+    coverage == null
+      ? null
+      : coverage >= 0.8
+        ? {
+            pct: Math.round(coverage * 100),
+            line: "You're a strong match — apply with confidence.",
+            tone: "text-emerald-600 dark:text-emerald-400",
+          }
+        : coverage >= 0.5
+          ? {
+              pct: Math.round(coverage * 100),
+              line: "You're within reach. Lead with where you're heading, not just what you have.",
+              tone: "text-primary",
+            }
+          : {
+              pct: Math.round(coverage * 100),
+              line: "It's a stretch — but a clear story about your direction can still land. No harm in trying.",
+              tone: "text-amber-600 dark:text-amber-400",
+            };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -56,6 +81,14 @@ export function ApplyDialog({
             role fits where you&apos;re heading.
           </DialogDescription>
         </DialogHeader>
+        {readiness && (
+          <div className="rounded-lg border bg-muted/40 p-3 text-sm">
+            <span className={`font-medium ${readiness.tone}`}>
+              {readiness.pct}% ready
+            </span>{" "}
+            <span className="text-muted-foreground">— {readiness.line}</span>
+          </div>
+        )}
         <div className="space-y-2">
           <Label htmlFor="note">Cover note (optional)</Label>
           <Textarea

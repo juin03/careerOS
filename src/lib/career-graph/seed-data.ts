@@ -734,6 +734,45 @@ export const TRANSITIONS: Transition[] = [
     note: "Pharmacists who enjoy systems move into healthcare operations and leadership.",
   },
 
+  // ─── Cross-field bridges OUT of healthcare (career-switchers) ─────────────
+  // Healthcare is otherwise a closed cluster; these are the real, if less
+  // common, ways clinical people cross into business, data, and operations.
+  {
+    fromRoleId: "r_staff_nurse",
+    toRoleId: "r_sales_exec",
+    share: 0.09,
+    medianMonths: 12,
+    note: "A common exit from bedside nursing into medical or pharma sales — your clinical credibility is the edge. Less common, but a real, faster-paying switch.",
+  },
+  {
+    fromRoleId: "r_clinical_pharmacist",
+    toRoleId: "r_sales_exec",
+    share: 0.12,
+    medianMonths: 12,
+    note: "Pharmacists move into pharma/medical sales, where deep product knowledge sets you apart. A frequent first switch out of dispensing.",
+  },
+  {
+    fromRoleId: "r_specialist_nurse",
+    toRoleId: "r_biz_analyst",
+    share: 0.06,
+    medianMonths: 24,
+    note: "Into clinical informatics and health-tech — translating frontline reality into systems. Emerging, and you'd learn the analysis side.",
+  },
+  {
+    fromRoleId: "r_clinical_pharmacist",
+    toRoleId: "r_biz_analyst",
+    share: 0.05,
+    medianMonths: 24,
+    note: "Health-tech and digital-health teams value clinical depth. Expect to pick up requirements and data skills along the way.",
+  },
+  {
+    fromRoleId: "r_health_admin",
+    toRoleId: "r_operations_manager",
+    share: 0.2,
+    medianMonths: 24,
+    note: "Healthcare administration generalises into broader operations management — the bridge from clinical ops to running any business.",
+  },
+
   // ─── Business, Sales & Marketing ─────────────────────────────────────────
   {
     fromRoleId: "r_sales_exec",

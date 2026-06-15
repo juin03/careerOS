@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Route, Map } from "lucide-react";
+import { Route } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
+import { NavigateTabs } from "@/components/section-tabs";
 import { SavedRoadmap, type SavedRoadmapData } from "./saved-roadmap";
 
 export default async function RoadmapsPage() {
@@ -31,16 +32,10 @@ export default async function RoadmapsPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 p-4 sm:p-6">
+      <NavigateTabs className="-mx-4 px-4 sm:-mx-6 sm:px-6" />
       <PageHeader
         title="My roadmaps"
         subtitle="Saved plans toward your target roles. Check off steps as you go."
-        action={
-          <Button asChild variant="outline" className="gap-2">
-            <Link href="/candidate/landscape">
-              <Map className="h-4 w-4" /> Landscape
-            </Link>
-          </Button>
-        }
       />
 
       {roadmaps.length === 0 ? (

@@ -25,6 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { months } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function RoadmapDialog({
   targetRoleId,
@@ -35,6 +36,11 @@ export function RoadmapDialog({
   jobCompany,
   triggerLabel = "Generate my roadmap",
   triggerVariant = "outline",
+  triggerClassName = "w-full",
+  triggerSize = "default",
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  hideTrigger = false,
 }: {
   targetRoleId: string;
   targetTitle: string;
@@ -45,11 +51,25 @@ export function RoadmapDialog({
   jobCompany?: string;
   triggerLabel?: string;
   triggerVariant?: "outline" | "default" | "ghost" | "secondary";
+  triggerClassName?: string;
+  triggerSize?: "sm" | "default";
+  // Controlled mode: drive open state externally (e.g. from a context menu) and
+  // optionally hide the built-in trigger button.
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
   const [company, setCompany] = useState(jobCompany ?? "");
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [pending, startTransition] = useTransition();
+
+  function setOpen(o: boolean) {
+    if (controlledOnOpenChange) controlledOnOpenChange(o);
+    else setUncontrolledOpen(o);
+    if (!o) setRoadmap(null);
+  }
 
   function generate() {
     startTransition(async () => {
@@ -65,19 +85,19 @@ export function RoadmapDialog({
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (!o) setRoadmap(null);
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button variant={triggerVariant} className="w-full gap-2">
-          <Route className="h-4 w-4" />
-          {triggerLabel}
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button
+            variant={triggerVariant}
+            size={triggerSize}
+            className={cn(triggerClassName, "gap-2")}
+          >
+            <Route className="h-4 w-4" />
+            {triggerLabel}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
